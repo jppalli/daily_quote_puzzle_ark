@@ -290,6 +290,28 @@
                 flex-direction: column;
                 gap: 25px;
             }
+
+            /* Intermediate mobile breakpoint to prevent header size jumps */
+            .newspaper-title {
+                font-size: 19px;
+            }
+
+            .header {
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            /* Additional intermediate breakpoint to prevent header size jumps */
+            .newspaper-title {
+                font-size: 17px;
+            }
+
+            .header {
+                padding-bottom: 9px;
+                margin-bottom: 9px;
+            }
         }
 
         .cta-text {
