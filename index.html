@@ -1613,7 +1613,9 @@
             .newspaper-container {
                 padding: 8px;
                 height: 100vh;
+                height: 100dvh; /* Dynamic viewport height for mobile browsers */
                 overflow-y: auto;
+                box-sizing: border-box;
                 /* Account for mobile browser UI */
                 min-height: calc(100vh - 120px);
             }
@@ -1637,7 +1639,7 @@
                 font-size: 14px;
                 line-height: 1.3;
                 padding: 0 6px;
-                margin-bottom: 8px;
+                margin-bottom: 10px;
             }
 
             .author {
@@ -1645,8 +1647,8 @@
                 padding-top: 6px;
                 /* Handle long author names */
                 word-wrap: break-word;
+                overflow-wrap: break-word;
                 hyphens: auto;
-                max-width: 100%;
             }
 
             /* Compact Input Area for Mobile */
@@ -1734,7 +1736,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 5px;
+                gap: 4px;
             }
 
             /* Mobile Menu Improvements */
@@ -1781,6 +1783,7 @@
                 justify-content: center;
                 /* Handle long author names */
                 word-wrap: break-word;
+                overflow-wrap: break-word;
                 hyphens: auto;
                 max-width: 100%;
             }
@@ -1789,8 +1792,8 @@
         @media (max-width: 480px) {
             .newspaper-container {
                 padding: 6px;
-                /* Account for mobile browser UI */
-                min-height: calc(100vh - 100px);
+                height: 100vh;
+                height: 100dvh;
             }
 
             .newspaper-title {
@@ -1846,8 +1849,8 @@
             }
 
             .btn {
-                padding: 5px 10px;
-                font-size: 12px;
+                padding: 4px 8px;
+                font-size: 11px;
                 min-height: 32px;
                 min-width: 50px;
             }
@@ -1892,8 +1895,22 @@
             /* Ultra Compact Mobile Optimizations */
             .newspaper-container {
                 padding: 4px;
-                /* Account for mobile browser UI */
-                min-height: calc(100vh - 80px);
+                height: 100vh;
+                height: 100dvh;
+            }
+
+            .header {
+                padding-bottom: 4px;
+                margin-bottom: 4px;
+            }
+
+            .newspaper-title {
+                font-size: 12px;
+            }
+
+            .quote-container {
+                padding: 4px 0;
+                margin-bottom: 4px;
             }
 
             .letter-cell,
@@ -1915,10 +1932,10 @@
             }
 
             .btn {
-                padding: 4px 8px;
-                font-size: 11px;
+                padding: 3px 6px;
+                font-size: 10px;
                 min-height: 28px;
-                min-width: 45px;
+                min-width: 40px;
             }
 
             .quote-word.scrambled {
@@ -1940,7 +1957,7 @@
             }
 
             .author {
-                font-size: 9px;
+                font-size: 8px;
             }
 
             .input-area {
@@ -1949,21 +1966,7 @@
             }
 
             .input-title {
-                font-size: 11px;
-                margin-bottom: 5px;
-            }
-
-            .header {
-                padding-bottom: 4px;
-                margin-bottom: 4px;
-            }
-
-            .newspaper-title {
-                font-size: 12px;
-            }
-
-            .quote-container {
-                padding: 4px 0;
+                font-size: 10px;
                 margin-bottom: 4px;
             }
         }
@@ -2029,6 +2032,7 @@
         @media (max-width: 768px) and (orientation: landscape) {
             .newspaper-container {
                 height: 100vh;
+                height: 100dvh; /* Dynamic viewport height for mobile browsers */
                 overflow-y: auto;
                 padding: 3px;
                 /* Account for mobile browser UI in landscape */
@@ -2061,8 +2065,8 @@
                 padding-top: 2px;
                 /* Handle long author names in landscape */
                 word-wrap: break-word;
+                overflow-wrap: break-word;
                 hyphens: auto;
-                max-width: 100%;
             }
 
             .input-area {
@@ -2116,16 +2120,21 @@
             }
 
             .quote-word.scrambled {
-                padding: 1px 2px;
+                padding: 1px 3px;
                 font-size: 10px;
                 min-height: 20px;
             }
 
             .author.scrambled {
-                padding: 1px 4px;
+                padding: 1px 6px;
                 font-size: 8px;
                 min-height: 20px;
+                /* Handle long author names in landscape */
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                hyphens: auto;
             }
+        }
         }
 
         /* Prevent zoom on input focus for mobile */
