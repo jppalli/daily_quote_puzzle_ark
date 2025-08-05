@@ -1604,6 +1604,16 @@
                 min-height: 45px;
                 min-width: 45px;
                 /* Better touch feedback */
+            }
+
+            /* Reduced button sizes for mobile */
+            .cta-button {
+                padding: 8px 16px;
+                font-size: 14px;
+                border-radius: 4px;
+            }
+
+            .letter-btn {
                 -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
                 transition: all 0.15s ease;
             }
@@ -1951,6 +1961,13 @@
                 font-size: 12px;
                 margin-bottom: 6px;
             }
+
+            /* Reduced button sizes for small mobile */
+            .cta-button {
+                padding: 6px 12px;
+                font-size: 12px;
+                border-radius: 3px;
+            }
         }
 
         @media (max-width: 360px) {
@@ -2047,6 +2064,13 @@
 
             .letter-cells {
                 gap: 2px;
+            }
+
+            /* Reduced button sizes for ultra small mobile */
+            .cta-button {
+                padding: 4px 10px;
+                font-size: 10px;
+                border-radius: 3px;
             }
 
             .btn {
@@ -2361,7 +2385,7 @@
                     <div class="cta-section">
                         <div class="cta-text">Ready for more?</div>
                         <a href="#" class="cta-button" id="pastChallengesBtn">
-                            <i class="fas fa-calendar-alt"></i> Past Challenges
+                            <i class="fas fa-calendar-alt"></i> Past Quotes
                         </a>
                     </div>
                     <div class="cta-section">
@@ -2398,7 +2422,7 @@
     <div class="modal" id="calendarModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Past Challenges</h2>
+                <h2>Past Quotes</h2>
                 <button class="close-modal" id="closeCalendar">&times;</button>
             </div>
             <div class="calendar-navigation">
