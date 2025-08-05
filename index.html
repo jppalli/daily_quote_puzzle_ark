@@ -1611,89 +1611,94 @@
         /* Mobile Responsiveness Improvements */
         @media (max-width: 768px) {
             .newspaper-container {
-                padding: 15px;
+                padding: 10px;
                 height: 100vh;
                 overflow-y: auto;
             }
 
             .header {
-                padding-bottom: 10px;
-                margin-bottom: 15px;
+                padding-bottom: 8px;
+                margin-bottom: 10px;
             }
 
             .newspaper-title {
-                font-size: 20px;
+                font-size: 18px;
                 letter-spacing: 1px;
             }
 
+            .quote-container {
+                padding: 10px 0;
+                margin-bottom: 10px;
+            }
+
             .quote-text {
-                font-size: 18px;
-                line-height: 1.6;
-                padding: 0 10px;
-                margin-bottom: 20px;
+                font-size: 16px;
+                line-height: 1.4;
+                padding: 0 8px;
+                margin-bottom: 12px;
             }
 
             .author {
-                font-size: 16px;
-                padding-top: 10px;
+                font-size: 14px;
+                padding-top: 8px;
             }
 
-            /* Improved Input Area for Mobile */
+            /* Compact Input Area for Mobile */
             .input-area {
-                padding: 15px;
-                min-height: 200px;
-                margin-bottom: 15px;
+                padding: 12px;
+                min-height: 160px;
+                margin-bottom: 10px;
             }
 
             .input-title {
-                font-size: 18px;
-                margin-bottom: 15px;
+                font-size: 16px;
+                margin-bottom: 10px;
             }
 
-            /* Larger Touch Targets for Mobile */
+            /* Compact Touch Targets for Mobile */
             .letter-cells {
-                gap: 8px;
-                margin-bottom: 20px;
+                gap: 6px;
+                margin-bottom: 12px;
                 justify-content: center;
                 flex-wrap: wrap;
             }
 
             .letter-cell {
-                width: 60px;
-                height: 60px;
-                font-size: 26px;
-                border-width: 3px;
-                border-radius: 8px;
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+                border-width: 2px;
+                border-radius: 6px;
                 /* Improved touch target */
-                min-height: 60px;
-                min-width: 60px;
+                min-height: 50px;
+                min-width: 50px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
 
             .letter-cell:after {
-                bottom: 8px;
-                height: 3px;
+                bottom: 6px;
+                height: 2px;
             }
 
-            /* Larger Letter Buttons for Mobile */
+            /* Compact Letter Buttons for Mobile */
             .available-letters {
-                gap: 8px;
-                margin-bottom: 20px;
-                padding: 10px;
+                gap: 6px;
+                margin-bottom: 12px;
+                padding: 8px;
                 justify-content: center;
             }
 
             .letter-btn {
-                width: 60px;
-                height: 60px;
-                font-size: 26px;
-                border-width: 3px;
-                border-radius: 8px;
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+                border-width: 2px;
+                border-radius: 6px;
                 /* Improved touch target */
-                min-height: 60px;
-                min-width: 60px;
+                min-height: 50px;
+                min-width: 50px;
                 /* Better touch feedback */
                 -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
                 transition: all 0.15s ease;
@@ -1704,26 +1709,26 @@
                 transform: scale(0.95);
             }
 
-            /* Improved Controls for Mobile */
+            /* Compact Controls for Mobile */
             .controls {
-                gap: 12px;
-                margin-top: 20px;
+                gap: 8px;
+                margin-top: 12px;
                 flex-wrap: wrap;
                 justify-content: center;
             }
 
             .btn {
-                padding: 12px 20px;
-                font-size: 16px;
+                padding: 8px 16px;
+                font-size: 14px;
                 border-width: 2px;
-                border-radius: 8px;
+                border-radius: 6px;
                 /* Better touch target */
-                min-height: 48px;
-                min-width: 80px;
+                min-height: 40px;
+                min-width: 70px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 8px;
+                gap: 6px;
             }
 
             /* Mobile Menu Improvements */
@@ -1733,11 +1738,11 @@
             }
 
             .menu-item {
-                padding: 16px 20px;
+                padding: 14px 20px;
             }
 
             .menu-item-label {
-                font-size: 16px;
+                font-size: 15px;
             }
 
             /* Modal Improvements for Mobile */
@@ -1750,21 +1755,21 @@
 
             /* Quote Word Improvements for Mobile */
             .quote-word.scrambled {
-                padding: 6px 12px;
-                margin: 0 3px;
-                font-size: 18px;
+                padding: 4px 8px;
+                margin: 0 2px;
+                font-size: 16px;
                 /* Better touch target */
-                min-height: 44px;
+                min-height: 36px;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
             }
 
             .author.scrambled {
-                padding: 8px 20px;
-                font-size: 16px;
+                padding: 6px 16px;
+                font-size: 14px;
                 /* Better touch target */
-                min-height: 44px;
+                min-height: 36px;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
@@ -1773,79 +1778,80 @@
 
         @media (max-width: 480px) {
             .newspaper-container {
-                padding: 10px;
-            }
-
-            .newspaper-title {
-                font-size: 18px;
-            }
-
-            .quote-text {
-                font-size: 16px;
-                line-height: 1.5;
-                padding: 0 5px;
-            }
-
-            .author {
-                font-size: 14px;
-            }
-
-            /* Even Larger Touch Targets for Small Mobile */
-            .letter-cells {
-                gap: 6px;
-                margin-bottom: 15px;
-            }
-
-            .letter-cell {
-                width: 65px;
-                height: 65px;
-                font-size: 28px;
-                border-width: 3px;
-                border-radius: 10px;
-                min-height: 65px;
-                min-width: 65px;
-            }
-
-            .available-letters {
-                gap: 6px;
                 padding: 8px;
             }
 
-            .letter-btn {
-                width: 65px;
-                height: 65px;
-                font-size: 28px;
-                border-width: 3px;
-                border-radius: 10px;
-                min-height: 65px;
-                min-width: 65px;
+            .newspaper-title {
+                font-size: 16px;
             }
 
-            /* Improved Controls for Small Mobile */
+            .quote-text {
+                font-size: 14px;
+                line-height: 1.3;
+                padding: 0 4px;
+                margin-bottom: 8px;
+            }
+
+            .author {
+                font-size: 12px;
+            }
+
+            /* Even More Compact Touch Targets for Small Mobile */
+            .letter-cells {
+                gap: 4px;
+                margin-bottom: 10px;
+            }
+
+            .letter-cell {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+                border-width: 2px;
+                border-radius: 6px;
+                min-height: 45px;
+                min-width: 45px;
+            }
+
+            .available-letters {
+                gap: 4px;
+                padding: 6px;
+            }
+
+            .letter-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+                border-width: 2px;
+                border-radius: 6px;
+                min-height: 45px;
+                min-width: 45px;
+            }
+
+            /* Compact Controls for Small Mobile */
             .controls {
-                gap: 10px;
-                margin-top: 15px;
+                gap: 6px;
+                margin-top: 10px;
             }
 
             .btn {
-                padding: 14px 18px;
-                font-size: 15px;
-                min-height: 52px;
-                min-width: 90px;
+                padding: 6px 12px;
+                font-size: 13px;
+                min-height: 36px;
+                min-width: 60px;
             }
 
             /* Quote Word Improvements for Small Mobile */
             .quote-word.scrambled {
-                padding: 8px 14px;
-                margin: 0 2px;
-                font-size: 16px;
-                min-height: 48px;
+                padding: 3px 6px;
+                margin: 0 1px;
+                font-size: 14px;
+                min-height: 32px;
             }
 
             .author.scrambled {
-                padding: 10px 24px;
-                font-size: 14px;
-                min-height: 48px;
+                padding: 4px 12px;
+                font-size: 12px;
+                min-height: 32px;
             }
 
             /* Modal Improvements for Small Mobile */
@@ -1861,42 +1867,62 @@
         }
 
         @media (max-width: 360px) {
-            /* Ultra Small Mobile Optimizations */
+            /* Ultra Compact Mobile Optimizations */
             .letter-cell,
             .letter-btn {
-                width: 70px;
-                height: 70px;
-                font-size: 30px;
-                min-height: 70px;
-                min-width: 70px;
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                min-height: 40px;
+                min-width: 40px;
             }
 
             .available-letters {
-                gap: 4px;
-                padding: 5px;
+                gap: 3px;
+                padding: 4px;
             }
 
             .letter-cells {
-                gap: 4px;
+                gap: 3px;
             }
 
             .btn {
-                padding: 16px 16px;
-                font-size: 14px;
-                min-height: 56px;
-                min-width: 100px;
+                padding: 5px 10px;
+                font-size: 12px;
+                min-height: 32px;
+                min-width: 50px;
             }
 
             .quote-word.scrambled {
-                padding: 10px 16px;
-                font-size: 14px;
-                min-height: 52px;
+                padding: 2px 4px;
+                font-size: 12px;
+                min-height: 28px;
             }
 
             .author.scrambled {
-                padding: 12px 28px;
+                padding: 3px 8px;
+                font-size: 10px;
+                min-height: 28px;
+            }
+
+            .quote-text {
                 font-size: 12px;
-                min-height: 52px;
+                line-height: 1.2;
+                margin-bottom: 6px;
+            }
+
+            .author {
+                font-size: 10px;
+            }
+
+            .input-area {
+                padding: 8px;
+                min-height: 120px;
+            }
+
+            .input-title {
+                font-size: 14px;
+                margin-bottom: 8px;
             }
         }
 
@@ -1962,64 +1988,95 @@
             .newspaper-container {
                 height: 100vh;
                 overflow-y: auto;
+                padding: 5px;
+            }
+
+            .header {
+                padding-bottom: 5px;
+                margin-bottom: 5px;
+            }
+
+            .newspaper-title {
+                font-size: 14px;
             }
 
             .quote-container {
-                padding: 10px 0;
-                margin-bottom: 10px;
+                padding: 5px 0;
+                margin-bottom: 5px;
             }
 
             .quote-text {
-                font-size: 16px;
-                margin-bottom: 15px;
+                font-size: 12px;
+                line-height: 1.2;
+                margin-bottom: 8px;
+                padding: 0 4px;
             }
 
             .author {
-                font-size: 14px;
-                padding-top: 8px;
+                font-size: 10px;
+                padding-top: 4px;
             }
 
             .input-area {
-                padding: 10px;
-                min-height: 150px;
+                padding: 6px;
+                min-height: 100px;
+                margin-bottom: 5px;
+            }
+
+            .input-title {
+                font-size: 12px;
+                margin-bottom: 6px;
             }
 
             .letter-cells {
-                gap: 6px;
-                margin-bottom: 15px;
+                gap: 3px;
+                margin-bottom: 8px;
             }
 
             .letter-cell {
-                width: 50px;
-                height: 50px;
-                font-size: 22px;
-                min-height: 50px;
-                min-width: 50px;
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+                min-height: 35px;
+                min-width: 35px;
             }
 
             .available-letters {
-                gap: 6px;
-                margin-bottom: 15px;
+                gap: 3px;
+                margin-bottom: 8px;
+                padding: 4px;
             }
 
             .letter-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 22px;
-                min-height: 50px;
-                min-width: 50px;
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+                min-height: 35px;
+                min-width: 35px;
             }
 
             .controls {
-                gap: 10px;
-                margin-top: 10px;
+                gap: 4px;
+                margin-top: 6px;
             }
 
             .btn {
-                padding: 8px 16px;
-                font-size: 14px;
-                min-height: 40px;
-                min-width: 70px;
+                padding: 4px 8px;
+                font-size: 11px;
+                min-height: 28px;
+                min-width: 50px;
+            }
+
+            .quote-word.scrambled {
+                padding: 2px 4px;
+                font-size: 12px;
+                min-height: 24px;
+            }
+
+            .author.scrambled {
+                padding: 2px 8px;
+                font-size: 10px;
+                min-height: 24px;
             }
         }
 
