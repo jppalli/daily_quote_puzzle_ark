@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Quote Puzzle - Modern</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1605,6 +1605,447 @@
 
             .hamburger-menu {
                 left: 8px;
+            }
+        }
+
+        /* Mobile Responsiveness Improvements */
+        @media (max-width: 768px) {
+            .newspaper-container {
+                padding: 15px;
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .header {
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+            }
+
+            .newspaper-title {
+                font-size: 20px;
+                letter-spacing: 1px;
+            }
+
+            .quote-text {
+                font-size: 18px;
+                line-height: 1.6;
+                padding: 0 10px;
+                margin-bottom: 20px;
+            }
+
+            .author {
+                font-size: 16px;
+                padding-top: 10px;
+            }
+
+            /* Improved Input Area for Mobile */
+            .input-area {
+                padding: 15px;
+                min-height: 200px;
+                margin-bottom: 15px;
+            }
+
+            .input-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+
+            /* Larger Touch Targets for Mobile */
+            .letter-cells {
+                gap: 8px;
+                margin-bottom: 20px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .letter-cell {
+                width: 60px;
+                height: 60px;
+                font-size: 26px;
+                border-width: 3px;
+                border-radius: 8px;
+                /* Improved touch target */
+                min-height: 60px;
+                min-width: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .letter-cell:after {
+                bottom: 8px;
+                height: 3px;
+            }
+
+            /* Larger Letter Buttons for Mobile */
+            .available-letters {
+                gap: 8px;
+                margin-bottom: 20px;
+                padding: 10px;
+                justify-content: center;
+            }
+
+            .letter-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 26px;
+                border-width: 3px;
+                border-radius: 8px;
+                /* Improved touch target */
+                min-height: 60px;
+                min-width: 60px;
+                /* Better touch feedback */
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+                transition: all 0.15s ease;
+            }
+
+            .letter-btn:not(.used):active {
+                background: #d0d0d0;
+                transform: scale(0.95);
+            }
+
+            /* Improved Controls for Mobile */
+            .controls {
+                gap: 12px;
+                margin-top: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 16px;
+                border-width: 2px;
+                border-radius: 8px;
+                /* Better touch target */
+                min-height: 48px;
+                min-width: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            /* Mobile Menu Improvements */
+            .slide-menu {
+                width: 85%;
+                max-width: 320px;
+            }
+
+            .menu-item {
+                padding: 16px 20px;
+            }
+
+            .menu-item-label {
+                font-size: 16px;
+            }
+
+            /* Modal Improvements for Mobile */
+            .modal-content {
+                width: 95%;
+                max-width: 400px;
+                padding: 20px;
+                margin: 20px;
+            }
+
+            /* Quote Word Improvements for Mobile */
+            .quote-word.scrambled {
+                padding: 6px 12px;
+                margin: 0 3px;
+                font-size: 18px;
+                /* Better touch target */
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .author.scrambled {
+                padding: 8px 20px;
+                font-size: 16px;
+                /* Better touch target */
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .newspaper-container {
+                padding: 10px;
+            }
+
+            .newspaper-title {
+                font-size: 18px;
+            }
+
+            .quote-text {
+                font-size: 16px;
+                line-height: 1.5;
+                padding: 0 5px;
+            }
+
+            .author {
+                font-size: 14px;
+            }
+
+            /* Even Larger Touch Targets for Small Mobile */
+            .letter-cells {
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+
+            .letter-cell {
+                width: 65px;
+                height: 65px;
+                font-size: 28px;
+                border-width: 3px;
+                border-radius: 10px;
+                min-height: 65px;
+                min-width: 65px;
+            }
+
+            .available-letters {
+                gap: 6px;
+                padding: 8px;
+            }
+
+            .letter-btn {
+                width: 65px;
+                height: 65px;
+                font-size: 28px;
+                border-width: 3px;
+                border-radius: 10px;
+                min-height: 65px;
+                min-width: 65px;
+            }
+
+            /* Improved Controls for Small Mobile */
+            .controls {
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .btn {
+                padding: 14px 18px;
+                font-size: 15px;
+                min-height: 52px;
+                min-width: 90px;
+            }
+
+            /* Quote Word Improvements for Small Mobile */
+            .quote-word.scrambled {
+                padding: 8px 14px;
+                margin: 0 2px;
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            .author.scrambled {
+                padding: 10px 24px;
+                font-size: 14px;
+                min-height: 48px;
+            }
+
+            /* Modal Improvements for Small Mobile */
+            .modal-content {
+                width: 98%;
+                padding: 15px;
+                margin: 10px;
+            }
+
+            .slide-menu {
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 360px) {
+            /* Ultra Small Mobile Optimizations */
+            .letter-cell,
+            .letter-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 30px;
+                min-height: 70px;
+                min-width: 70px;
+            }
+
+            .available-letters {
+                gap: 4px;
+                padding: 5px;
+            }
+
+            .letter-cells {
+                gap: 4px;
+            }
+
+            .btn {
+                padding: 16px 16px;
+                font-size: 14px;
+                min-height: 56px;
+                min-width: 100px;
+            }
+
+            .quote-word.scrambled {
+                padding: 10px 16px;
+                font-size: 14px;
+                min-height: 52px;
+            }
+
+            .author.scrambled {
+                padding: 12px 28px;
+                font-size: 12px;
+                min-height: 52px;
+            }
+        }
+
+        /* Touch-specific improvements for all mobile devices */
+        @media (hover: none) and (pointer: coarse) {
+            /* Disable hover effects on touch devices */
+            .letter-btn:not(.used):hover {
+                transform: none;
+                background: #fff;
+            }
+
+            .btn:hover {
+                background: #fff;
+                color: #222;
+            }
+
+            .quote-word.scrambled:hover {
+                background: #f0f0f0;
+            }
+
+            .author.scrambled:hover {
+                background: #f0f0f0;
+            }
+
+            /* Enhanced touch feedback */
+            .letter-btn:not(.used):active {
+                background: #d0d0d0;
+                transform: scale(0.95);
+            }
+
+            .btn:active {
+                background: #222;
+                color: white;
+                transform: scale(0.98);
+            }
+
+            .quote-word.scrambled:active {
+                background: #e0e0e0;
+                transform: scale(0.98);
+            }
+
+            .author.scrambled:active {
+                background: #e0e0e0;
+                transform: scale(0.98);
+            }
+
+            /* Prevent text selection on touch */
+            .letter-btn,
+            .btn,
+            .quote-word.scrambled,
+            .author.scrambled {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                -webkit-touch-callout: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
+
+        /* Landscape orientation improvements for mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .newspaper-container {
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .quote-container {
+                padding: 10px 0;
+                margin-bottom: 10px;
+            }
+
+            .quote-text {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            .author {
+                font-size: 14px;
+                padding-top: 8px;
+            }
+
+            .input-area {
+                padding: 10px;
+                min-height: 150px;
+            }
+
+            .letter-cells {
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+
+            .letter-cell {
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+                min-height: 50px;
+                min-width: 50px;
+            }
+
+            .available-letters {
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+
+            .letter-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+                min-height: 50px;
+                min-width: 50px;
+            }
+
+            .controls {
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 14px;
+                min-height: 40px;
+                min-width: 70px;
+            }
+        }
+
+        /* Prevent zoom on input focus for mobile */
+        @media (max-width: 768px) {
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Improved scrolling for mobile */
+        @media (max-width: 768px) {
+            .newspaper-container {
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+            }
+        }
+
+        /* Better focus indicators for accessibility */
+        @media (max-width: 768px) {
+            .letter-btn:focus,
+            .btn:focus,
+            .quote-word.scrambled:focus,
+            .author.scrambled:focus {
+                outline: 3px solid #007bff;
+                outline-offset: 2px;
             }
         }
     </style>

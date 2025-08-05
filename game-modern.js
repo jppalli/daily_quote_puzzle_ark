@@ -802,7 +802,7 @@ class DailyQuotePuzzle {
         // Only add click handlers if game is not complete
         if (!this.gameComplete) {
             document.querySelectorAll('.quote-word.scrambled').forEach(el => {
-                el.addEventListener('click', () => this.handleWordClick(
+                this.addMobileTouchHandling(el, () => this.handleWordClick(
                     this.currentQuote.scrambledWords.find(sw => sw.index === parseInt(el.dataset.wordIndex))
                 ));
             });
@@ -819,7 +819,10 @@ class DailyQuotePuzzle {
             const scrambledAuthorWithGaps = this.currentQuote.scrambledAuthor.replace(/\s+/g, '   ');
             this.elements.quoteAuthor.innerHTML = `<span class="author scrambled ${isActive ? 'active' : ''}"
                                                         id="authorScrambled">${scrambledAuthorWithGaps}</span>`;
-            document.getElementById('authorScrambled').addEventListener('click', () => this.handleAuthorClick());
+            const authorElement = document.getElementById('authorScrambled');
+            if (authorElement) {
+                this.addMobileTouchHandling(authorElement, () => this.handleAuthorClick());
+            }
         }
     }
     
@@ -952,13 +955,87 @@ class DailyQuotePuzzle {
             btn.dataset.index = index;
             
             if (!this.usedLetters.includes(index)) {
-                btn.addEventListener('click', () => this.handleLetterClick(letter, index));
+                // Enhanced mobile touch handling
+                this.addMobileTouchHandling(btn, () => this.handleLetterClick(letter, index));
             }
             
             this.elements.availableLetters.appendChild(btn);
         });
     }
     
+    // Add mobile-specific touch handling
+    addMobileTouchHandling(element, callback) {
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        let touchStartX = 0;
+        let isTouchMoved = false;
+        
+        // Handle both click and touch events for better mobile responsiveness
+        const handleInteraction = (event) => {
+            // Prevent default behavior to avoid double-triggering
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Add visual feedback
+            element.style.transform = 'scale(0.95)';
+            element.style.background = '#d0d0d0';
+            
+            // Execute callback after a short delay for better visual feedback
+            setTimeout(() => {
+                callback();
+                // Reset visual state
+                element.style.transform = '';
+                element.style.background = '';
+            }, 50);
+        };
+        
+        // Touch event handling for mobile
+        element.addEventListener('touchstart', (event) => {
+            touchStartTime = Date.now();
+            touchStartY = event.touches[0].clientY;
+            touchStartX = event.touches[0].clientX;
+            isTouchMoved = false;
+            
+            // Prevent zoom on double tap
+            event.preventDefault();
+        }, { passive: false });
+        
+        element.addEventListener('touchmove', (event) => {
+            const touchY = event.touches[0].clientY;
+            const touchX = event.touches[0].clientX;
+            const deltaY = Math.abs(touchY - touchStartY);
+            const deltaX = Math.abs(touchX - touchStartX);
+            
+            // If touch moved significantly, mark as moved
+            if (deltaY > 10 || deltaX > 10) {
+                isTouchMoved = true;
+            }
+        });
+        
+        element.addEventListener('touchend', (event) => {
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            
+            // Only trigger if touch was short and didn't move much
+            if (touchDuration < 300 && !isTouchMoved) {
+                handleInteraction(event);
+            }
+        });
+        
+        // Mouse click handling for desktop
+        element.addEventListener('click', (event) => {
+            // Only handle mouse clicks if not on a touch device
+            if (!('ontouchstart' in window)) {
+                handleInteraction(event);
+            }
+        });
+        
+        // Prevent context menu on long press
+        element.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+        });
+    }
+
     handleLetterClick(letter, index) {
         if (this.usedLetters.includes(index) || this.isUnscrambling) return;
         
@@ -1876,16 +1953,16 @@ class DailyQuotePuzzle {
             settingsIcon: !!this.elements.settingsIcon
         });
         
-        // Hamburger Menu Controls
+        // Hamburger Menu Controls with mobile touch handling
         if (this.elements.hamburgerMenu) {
-            this.elements.hamburgerMenu.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.hamburgerMenu, () => {
                 this.toggleMenu();
                 this.playButtonClickSound();
             });
         }
         
         if (this.elements.closeMenu) {
-            this.elements.closeMenu.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.closeMenu, () => {
                 this.closeMenu();
                 this.playButtonClickSound();
             });
@@ -1897,9 +1974,9 @@ class DailyQuotePuzzle {
             });
         }
         
-        // Menu Navigation Links
+        // Menu Navigation Links with mobile touch handling
         if (this.elements.menuStatsLink) {
-            this.elements.menuStatsLink.addEventListener('click', async () => {
+            this.addMobileTouchHandling(this.elements.menuStatsLink, async () => {
                 this.closeMenu();
                 await this.updateStatsDisplay();
                 this.elements.statsModal.style.display = 'flex';
@@ -1908,7 +1985,7 @@ class DailyQuotePuzzle {
         }
         
         if (this.elements.menuCalendarLink) {
-            this.elements.menuCalendarLink.addEventListener('click', async () => {
+            this.addMobileTouchHandling(this.elements.menuCalendarLink, async () => {
                 this.closeMenu();
                 this.elements.calendarModal.style.display = 'flex';
                 await this.renderCalendar();
@@ -1917,7 +1994,7 @@ class DailyQuotePuzzle {
         }
         
         if (this.elements.menuHelpLink) {
-            this.elements.menuHelpLink.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.menuHelpLink, () => {
                 this.closeMenu();
                 this.elements.helpModal.style.display = 'flex';
                 this.playButtonClickSound();
@@ -1925,7 +2002,7 @@ class DailyQuotePuzzle {
         }
         
         if (this.elements.menuTestPersistenceLink) {
-            this.elements.menuTestPersistenceLink.addEventListener('click', async () => {
+            this.addMobileTouchHandling(this.elements.menuTestPersistenceLink, async () => {
                 this.closeMenu();
                 await this.testPersistence();
                 this.playButtonClickSound();
@@ -1933,7 +2010,7 @@ class DailyQuotePuzzle {
         }
         
         if (this.elements.menuChangeSongLink) {
-            this.elements.menuChangeSongLink.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.menuChangeSongLink, () => {
                 this.closeMenu();
                 this.showMusicSelection();
                 this.playButtonClickSound();
@@ -1966,15 +2043,15 @@ class DailyQuotePuzzle {
             });
         }
 
-        // Game controls
+        // Game controls with mobile touch handling
         if (this.elements.resetBtn) {
-            this.elements.resetBtn.addEventListener('click', () => this.resetInput());
+            this.addMobileTouchHandling(this.elements.resetBtn, () => this.resetInput());
         }
         if (this.elements.backspaceBtn) {
-            this.elements.backspaceBtn.addEventListener('click', () => this.handleBackspace());
+            this.addMobileTouchHandling(this.elements.backspaceBtn, () => this.handleBackspace());
         }
         if (this.elements.unscrambleBtn) {
-            this.elements.unscrambleBtn.addEventListener('click', async () => {
+            this.addMobileTouchHandling(this.elements.unscrambleBtn, async () => {
                 try {
                     await this.unscrambleCurrentWord();
                 } catch (error) {
@@ -2000,13 +2077,13 @@ class DailyQuotePuzzle {
         }
         
         if (this.elements.closeCalendar) {
-            this.elements.closeCalendar.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.closeCalendar, () => {
                 this.elements.calendarModal.style.display = 'none';
             });
         }
         
         if (this.elements.prevMonth) {
-            this.elements.prevMonth.addEventListener('click', async () => {
+            this.addMobileTouchHandling(this.elements.prevMonth, async () => {
                 this.currentCalendarMonth--;
                 if (this.currentCalendarMonth < 0) {
                     this.currentCalendarMonth = 11;
@@ -2017,7 +2094,7 @@ class DailyQuotePuzzle {
         }
         
         if (this.elements.nextMonth) {
-            this.elements.nextMonth.addEventListener('click', async () => {
+            this.addMobileTouchHandling(this.elements.nextMonth, async () => {
                 this.currentCalendarMonth++;
                 if (this.currentCalendarMonth > 11) {
                     this.currentCalendarMonth = 0;
@@ -2027,29 +2104,29 @@ class DailyQuotePuzzle {
             });
         }
         
-        // Help functionality
+        // Help functionality with mobile touch handling
         if (this.elements.helpIcon) {
-            this.elements.helpIcon.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.helpIcon, () => {
                 this.elements.helpModal.style.display = 'flex';
             });
         }
         
         if (this.elements.closeHelp) {
-            this.elements.closeHelp.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.closeHelp, () => {
                 this.elements.helpModal.style.display = 'none';
             });
         }
         
-        // Stats functionality
+        // Stats functionality with mobile touch handling
         if (this.elements.statsIcon) {
-            this.elements.statsIcon.addEventListener('click', async () => {
+            this.addMobileTouchHandling(this.elements.statsIcon, async () => {
                 await this.updateStatsDisplay();
                 this.elements.statsModal.style.display = 'flex';
             });
         }
         
         if (this.elements.closeStats) {
-            this.elements.closeStats.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.closeStats, () => {
                 this.elements.statsModal.style.display = 'none';
             });
         }
@@ -2057,22 +2134,22 @@ class DailyQuotePuzzle {
 
         
         if (this.elements.closeSettings) {
-            this.elements.closeSettings.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.closeSettings, () => {
                 this.elements.settingsModal.style.display = 'none';
             });
         }
         
-        // Music selection functionality
+        // Music selection functionality with mobile touch handling
         console.log('🎵 Change song button found:', !!this.elements.changeSongBtn);
         if (this.elements.changeSongBtn) {
-            this.elements.changeSongBtn.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.changeSongBtn, () => {
                 console.log('🎵 Change song clicked!');
                 this.showMusicSelection();
             });
         }
         
         if (this.elements.closeMusicSelection) {
-            this.elements.closeMusicSelection.addEventListener('click', () => {
+            this.addMobileTouchHandling(this.elements.closeMusicSelection, () => {
                 this.closeMusicSelection();
             });
         }
@@ -2113,10 +2190,10 @@ class DailyQuotePuzzle {
             }
         });
 
-        // Past challenges button in congrats section
+        // Past challenges button in congrats section with mobile touch handling
         const pastChallengesBtn = document.getElementById('pastChallengesBtn');
         if (pastChallengesBtn) {
-            pastChallengesBtn.addEventListener('click', async (e) => {
+            this.addMobileTouchHandling(pastChallengesBtn, async (e) => {
                 e.preventDefault();
                 // Just open the calendar modal without changing the current display
                 this.elements.calendarModal.style.display = 'flex';
@@ -2125,10 +2202,10 @@ class DailyQuotePuzzle {
             });
         }
 
-        // Share button in congrats section
+        // Share button in congrats section with mobile touch handling
         const shareFromCongratsBtn = document.getElementById('shareFromCongratsBtn');
         if (shareFromCongratsBtn) {
-            shareFromCongratsBtn.addEventListener('click', (e) => {
+            this.addMobileTouchHandling(shareFromCongratsBtn, (e) => {
                 e.preventDefault();
                 // Get today's date for sharing the current completed puzzle
                 const today = new Date();
