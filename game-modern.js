@@ -2,8 +2,8 @@
 class DailyQuotePuzzle {
     constructor() {
         this.quotes = quotesCalendar;
-        // Game initialization
-        this.currentQuote = this.findTodayQuote();
+        // Game initialization - will be set in init() after checking for saved state
+        this.currentQuote = null;
         // Quote selected for today
         this.activeWord = null;
         this.solvedWords = new Set();
@@ -172,8 +172,20 @@ class DailyQuotePuzzle {
         // Check for shared challenge in URL
         const sharedChallengeLoaded = await this.checkForSharedChallenge();
         
-        // Check if today's quote is already completed (only if no shared challenge)
-        if (!sharedChallengeLoaded) {
+        // Check for saved current puzzle state
+        const savedCurrentPuzzle = await this.loadCurrentPuzzleState();
+        
+        if (sharedChallengeLoaded) {
+            // Shared challenge takes priority
+            console.log('📤 Shared challenge loaded, ignoring saved state');
+        } else if (savedCurrentPuzzle) {
+            // Restore saved puzzle state
+            console.log('🔄 Restoring saved puzzle state:', savedCurrentPuzzle.date);
+            await this.loadChallengeForDate(savedCurrentPuzzle.date);
+        } else {
+            // No saved state, load today's puzzle
+            console.log('📅 No saved state found, loading today\'s puzzle');
+            this.currentQuote = this.findTodayQuote();
             await this.checkQuoteCompletionStatus();
         }
         
@@ -576,6 +588,63 @@ class DailyQuotePuzzle {
             }
         }
     }
+
+    async saveCurrentPuzzleState() {
+        if (!this.currentQuote) return;
+        
+        try {
+            const currentState = {
+                date: this.currentQuote.date,
+                solvedWords: Array.from(this.solvedWords),
+                authorSolved: this.authorSolved,
+                gameComplete: this.gameComplete,
+                activeWord: this.activeWord ? this.activeWord.original : null,
+                userInput: this.userInput,
+                usedLetters: this.usedLetters,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('dailyQuotePuzzleCurrentState', JSON.stringify(currentState));
+            console.log('💾 Saved current puzzle state:', currentState.date);
+        } catch (error) {
+            console.error('Error saving current puzzle state:', error);
+        }
+    }
+
+    async loadCurrentPuzzleState() {
+        try {
+            const stateStr = localStorage.getItem('dailyQuotePuzzleCurrentState');
+            if (stateStr) {
+                const state = JSON.parse(stateStr);
+                
+                // Check if the saved state is from today (if so, don't restore it)
+                const today = new Date();
+                const todayStr = this.formatDate(today);
+                if (state.date === todayStr) {
+                    console.log('🗑️ Saved state is from today, clearing it');
+                    localStorage.removeItem('dailyQuotePuzzleCurrentState');
+                    return null;
+                }
+                
+                // Check if the saved state is too old (older than 7 days)
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                const savedDate = new Date(state.date);
+                if (savedDate < sevenDaysAgo) {
+                    console.log('🗑️ Saved state is too old, clearing it');
+                    localStorage.removeItem('dailyQuotePuzzleCurrentState');
+                    return null;
+                }
+                
+                console.log('📂 Found saved puzzle state:', state.date);
+                return state;
+            }
+        } catch (error) {
+            console.error('Error loading current puzzle state:', error);
+        }
+        
+        return null;
+    }
     
     async recordPuzzleCompletion() {
         const userData = await this.loadUserData();
@@ -608,6 +677,10 @@ class DailyQuotePuzzle {
         userData.stats.lastPlayed = dateStr;
         
         await this.saveUserData(userData);
+        
+        // Clear saved puzzle state when puzzle is completed
+        localStorage.removeItem('dailyQuotePuzzleCurrentState');
+        console.log('🗑️ Cleared saved puzzle state after completion');
     }
 
     calculateCurrentStreak(userData) {
@@ -1045,6 +1118,9 @@ class DailyQuotePuzzle {
         this.playTypingSound();
         this.renderInputArea();
         
+        // Save current state after each letter click
+        this.saveCurrentPuzzleState();
+        
         // For authors, check against length without spaces
         const targetLength = this.activeWord.isAuthor ?
             this.activeWord.original.replace(/\s/g, '').length :
@@ -1068,6 +1144,9 @@ class DailyQuotePuzzle {
                     this.updateWordDisplay(this.activeWord);
                     this.playWordCompleteSound();
                 }
+                
+                // Save state after word/author completion
+                this.saveCurrentPuzzleState();
                 
                 setTimeout(() => {
                     this.activateNextWordSmoothly();
@@ -1270,6 +1349,9 @@ class DailyQuotePuzzle {
         this.userInput = this.userInput.length > 0 ? this.userInput.slice(0, -1) : '';
         this.usedLetters = this.usedLetters.length > 0 ? this.usedLetters.slice(0, -1) : [];
         this.renderInputArea();
+        
+        // Save current state after backspace
+        this.saveCurrentPuzzleState();
     }
     
     resetInput() {
@@ -1279,6 +1361,9 @@ class DailyQuotePuzzle {
         this.userInput = '';
         this.usedLetters = [];
         this.renderInputArea();
+        
+        // Save current state after reset
+        this.saveCurrentPuzzleState();
     }
     
     startUnscrambleCooldown() {
@@ -1840,29 +1925,77 @@ class DailyQuotePuzzle {
                 // Disable all interactive elements for completed challenges
                 this.disableInteractiveElements();
             } else {
-                // Quote is not completed, start fresh
-                this.solvedWords = new Set();
-                this.authorSolved = false;
-                this.activeWord = null;
-                this.userInput = '';
-                this.availableLetters = [];
-                this.usedLetters = [];
-                this.gameComplete = false;
-                this.startTime = new Date();
+                // Check for saved state for this specific puzzle
+                const savedState = await this.loadCurrentPuzzleState();
+                const shouldRestoreState = savedState && savedState.date === dateStr;
                 
-                this.elements.congrats.classList.remove('show');
-                this.hideCompletedChallengeButtons();
-                this.renderQuote();
-                this.updateDateDisplay();
-                this.renderInputArea();
-                
-                // Enable interactive elements for new challenges
-                this.enableInteractiveElements();
-                
-                if (this.currentQuote.scrambledWords.length > 0) {
-                    setTimeout(() => {
-                        this.handleWordClick(this.currentQuote.scrambledWords[0]);
-                    }, 300);
+                if (shouldRestoreState) {
+                    // Restore saved state
+                    console.log('🔄 Restoring saved state for puzzle:', dateStr);
+                    this.solvedWords = new Set(savedState.solvedWords || []);
+                    this.authorSolved = savedState.authorSolved || false;
+                    this.gameComplete = savedState.gameComplete || false;
+                    this.userInput = savedState.userInput || '';
+                    this.usedLetters = savedState.usedLetters || [];
+                    
+                    // Find the active word if it was saved
+                    if (savedState.activeWord) {
+                        this.activeWord = this.currentQuote.scrambledWords.find(
+                            sw => sw.original === savedState.activeWord
+                        ) || this.currentQuote.scrambledWords.find(
+                            sw => !this.solvedWords.has(sw.original)
+                        );
+                    } else {
+                        this.activeWord = null;
+                    }
+                    
+                    this.startTime = new Date();
+                    
+                    this.elements.congrats.classList.remove('show');
+                    this.hideCompletedChallengeButtons();
+                    this.renderQuote();
+                    this.updateDateDisplay();
+                    this.renderInputArea();
+                    
+                    // Enable interactive elements
+                    this.enableInteractiveElements();
+                    
+                    // Auto-activate first unsolved word if no active word
+                    if (!this.activeWord && this.currentQuote.scrambledWords.length > 0) {
+                        const firstUnsolved = this.currentQuote.scrambledWords.find(
+                            sw => !this.solvedWords.has(sw.original)
+                        );
+                        if (firstUnsolved) {
+                            setTimeout(() => {
+                                this.handleWordClick(firstUnsolved);
+                            }, 300);
+                        }
+                    }
+                } else {
+                    // Quote is not completed and no saved state, start fresh
+                    this.solvedWords = new Set();
+                    this.authorSolved = false;
+                    this.activeWord = null;
+                    this.userInput = '';
+                    this.availableLetters = [];
+                    this.usedLetters = [];
+                    this.gameComplete = false;
+                    this.startTime = new Date();
+                    
+                    this.elements.congrats.classList.remove('show');
+                    this.hideCompletedChallengeButtons();
+                    this.renderQuote();
+                    this.updateDateDisplay();
+                    this.renderInputArea();
+                    
+                    // Enable interactive elements for new challenges
+                    this.enableInteractiveElements();
+                    
+                    if (this.currentQuote.scrambledWords.length > 0) {
+                        setTimeout(() => {
+                            this.handleWordClick(this.currentQuote.scrambledWords[0]);
+                        }, 300);
+                    }
                 }
             }
         }
