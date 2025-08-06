@@ -1233,6 +1233,12 @@ class DailyQuotePuzzle {
             
             this.elements.congrats.classList.add('show');
             document.querySelector('.newspaper-container').classList.add('puzzle-complete');
+            
+            // Set up congrats buttons after showing the section
+            setTimeout(() => {
+                this.setupCongratsButtons();
+            }, 100);
+            
             this.playQuoteCompleteSound();
             
             const quoteContainer = document.querySelector('.quote-container');
@@ -2328,12 +2334,33 @@ class DailyQuotePuzzle {
             }
         });
 
+        // Set up congrats buttons (will be called when congrats is shown)
+        this.setupCongratsButtons();
+    }
+
+    setupCongratsButtons() {
         // Past challenges button in congrats section with mobile touch handling
         const pastChallengesBtn = document.getElementById('pastChallengesBtn');
+        console.log('🔍 Past challenges button found:', !!pastChallengesBtn);
         if (pastChallengesBtn) {
-            this.addMobileTouchHandling(pastChallengesBtn, async (e) => {
+            // Remove any existing event listeners
+            pastChallengesBtn.replaceWith(pastChallengesBtn.cloneNode(true));
+            const newPastChallengesBtn = document.getElementById('pastChallengesBtn');
+            
+            // Add both mobile touch handling and regular click event
+            this.addMobileTouchHandling(newPastChallengesBtn, async (e) => {
+                console.log('📅 Past challenges button clicked (mobile)!');
                 e.preventDefault();
                 // Just open the calendar modal without changing the current display
+                this.elements.calendarModal.style.display = 'flex';
+                await this.renderCalendar();
+                this.playButtonClickSound();
+            });
+            
+            // Fallback regular click event
+            newPastChallengesBtn.addEventListener('click', async (e) => {
+                console.log('📅 Past challenges button clicked (regular)!');
+                e.preventDefault();
                 this.elements.calendarModal.style.display = 'flex';
                 await this.renderCalendar();
                 this.playButtonClickSound();
@@ -2342,10 +2369,27 @@ class DailyQuotePuzzle {
 
         // Share button in congrats section with mobile touch handling
         const shareFromCongratsBtn = document.getElementById('shareFromCongratsBtn');
+        console.log('🔍 Share button found:', !!shareFromCongratsBtn);
         if (shareFromCongratsBtn) {
-            this.addMobileTouchHandling(shareFromCongratsBtn, (e) => {
+            // Remove any existing event listeners
+            shareFromCongratsBtn.replaceWith(shareFromCongratsBtn.cloneNode(true));
+            const newShareFromCongratsBtn = document.getElementById('shareFromCongratsBtn');
+            
+            // Add both mobile touch handling and regular click event
+            this.addMobileTouchHandling(newShareFromCongratsBtn, (e) => {
+                console.log('📤 Share button clicked (mobile)!');
                 e.preventDefault();
                 // Get today's date for sharing the current completed puzzle
+                const today = new Date();
+                const todayStr = this.formatDate(today);
+                this.shareQuote(todayStr);
+                this.playButtonClickSound();
+            });
+            
+            // Fallback regular click event
+            newShareFromCongratsBtn.addEventListener('click', (e) => {
+                console.log('📤 Share button clicked (regular)!');
+                e.preventDefault();
                 const today = new Date();
                 const todayStr = this.formatDate(today);
                 this.shareQuote(todayStr);
