@@ -1,7 +1,9 @@
 // Modern ES6+ Game Engine with PixiJS Integration
 class DailyQuotePuzzle {
     constructor() {
-        this.quotes = quotesCalendar;
+        // Initialize quote manager for remote updates
+        this.quoteManager = new QuoteManager();
+        this.quotes = quotesCalendar; // Fallback
         // Game initialization - will be set in init() after checking for saved state
         this.currentQuote = null;
         // Quote selected for today
@@ -86,10 +88,6 @@ class DailyQuotePuzzle {
         // DOM Elements
         this.elements = this.initializeElements();
 
-        // Timer for next quote countdown
-        this.nextQuoteTimer = null;
-        this.timerInterval = null;
-
         // Initialize the game
         this.init();
     }
@@ -148,12 +146,7 @@ class DailyQuotePuzzle {
             prevMonth: document.getElementById('prevMonth'),
             nextMonth: document.getElementById('nextMonth'),
             calendarMonthYear: document.getElementById('calendarMonthYear'),
-            pastChallengesBtn: document.getElementById('pastChallengesBtn'),
-            // Timer elements
-            nextQuoteTimer: document.getElementById('nextQuoteTimer'),
-            timerHours: document.getElementById('timerHours'),
-            timerMinutes: document.getElementById('timerMinutes'),
-            timerSeconds: document.getElementById('timerSeconds')
+            pastChallengesBtn: document.getElementById('pastChallengesBtn')
         };
 
         // Validate DOM elements are available
@@ -202,14 +195,6 @@ class DailyQuotePuzzle {
         this.updateDateDisplay();
         this.renderInputArea();
         this.setupEventListeners();
-        
-        // Timer will be started when puzzle is complete and it's today's quote
-        this.hideTimer();
-
-        // Clean up timer when page is unloaded
-        window.addEventListener('beforeunload', () => {
-            this.stopTimer();
-        });
 
         // Ensure all modals are hidden
         if (this.elements.calendarModal) this.elements.calendarModal.style.display = 'none';
@@ -758,14 +743,6 @@ class DailyQuotePuzzle {
         document.getElementById('congratsWinRate').textContent = `${winRate}%`;
         document.getElementById('congratsCurrentStreak').textContent = stats.currentStreak;
         document.getElementById('congratsMaxStreak').textContent = stats.maxStreak;
-
-        // Handle timer visibility in congrats section
-        if (this.isTodayQuote()) {
-            this.showTimer();
-            this.updateTimer();
-        } else {
-            this.hideTimer();
-        }
     }
 
     updateDateDisplay() {
@@ -790,17 +767,15 @@ class DailyQuotePuzzle {
 
         console.log('🔍 findTodayQuote() called');
         console.log('📅 Today:', todayStr);
-        console.log('📚 Total quotes available:', this.quotes.length);
 
-        // Find today's quote
-        const todayQuote = this.quotes.find(q => q.date === todayStr);
+        // Use quote manager to get today's quote (checks remote first, then local)
+        const todayQuote = this.quoteManager.getQuoteForDate(todayStr);
 
         if (todayQuote) {
             console.log(`✅ Found today's quote for ${todayStr}: "${todayQuote.text}"`);
             return todayQuote;
         } else {
             console.log(`❌ No quote found for today (${todayStr}), using first quote as fallback`);
-            console.log('📋 Available dates (first 10):', this.quotes.slice(0, 10).map(q => q.date));
             return this.quotes[0];
         }
     }
@@ -1735,14 +1710,6 @@ class DailyQuotePuzzle {
                 }
 
                 this.elements.calendarModal.style.display = 'none';
-                
-                // Update timer based on selected date
-                this.stopTimer(); // Stop any existing timer
-                if (this.isTodayQuote() && this.gameComplete) {
-                    this.startNextQuoteTimer();
-                } else {
-                    this.hideTimer();
-                }
             });
         });
 
@@ -2087,14 +2054,6 @@ class DailyQuotePuzzle {
                 }
             }
         }
-
-        // Update timer visibility based on whether this is today's quote
-        this.stopTimer(); // Stop any existing timer
-        if (this.isTodayQuote() && this.gameComplete) {
-            this.startNextQuoteTimer();
-        } else {
-            this.hideTimer();
-        }
     }
 
     disableInteractiveElements() {
@@ -2218,9 +2177,6 @@ class DailyQuotePuzzle {
                 this.closeMenu();
                 this.elements.calendarModal.style.display = 'flex';
                 await this.renderCalendar();
-                // Hide timer when viewing calendar
-                this.stopTimer();
-                this.hideTimer();
                 this.playButtonClickSound();
             });
         }
@@ -2306,22 +2262,12 @@ class DailyQuotePuzzle {
             this.elements.calendarIcon.addEventListener('click', async () => {
                 this.elements.calendarModal.style.display = 'flex';
                 await this.renderCalendar();
-                // Hide timer when viewing calendar
-                this.stopTimer();
-                this.hideTimer();
             });
         }
 
         if (this.elements.closeCalendar) {
             this.addMobileTouchHandling(this.elements.closeCalendar, () => {
                 this.elements.calendarModal.style.display = 'none';
-                // Restart timer when returning to today's quote
-                this.stopTimer(); // Stop any existing timer
-                if (this.isTodayQuote() && this.gameComplete) {
-                    this.startNextQuoteTimer();
-                } else {
-                    this.hideTimer();
-                }
             });
         }
 
@@ -2457,9 +2403,6 @@ class DailyQuotePuzzle {
                     try {
                         this.elements.calendarModal.style.display = 'flex';
                         await this.renderCalendar();
-                        // Hide timer when viewing calendar
-                        this.stopTimer();
-                        this.hideTimer();
                         this.playButtonClickSound();
                     } catch (error) {
                         console.error('Error opening calendar:', error);
@@ -2675,24 +2618,12 @@ class DailyQuotePuzzle {
         }
 
         modal.style.display = 'flex';
-
-        // Hide timer when viewing past challenges
-        this.stopTimer();
-        this.hideTimer();
     }
 
     closePastChallengesModal() {
         const modal = document.getElementById('pastChallengesModal');
         if (modal) {
             modal.style.display = 'none';
-        }
-
-        // Restart timer when returning to today's quote
-        this.stopTimer(); // Stop any existing timer
-        if (this.isTodayQuote() && this.gameComplete) {
-            this.startNextQuoteTimer();
-        } else {
-            this.hideTimer();
         }
     }
 
@@ -2797,78 +2728,6 @@ Check console for detailed logs.`;
         // Music selection disabled
         console.log('🎵 Music tracks loading is disabled');
         return;
-    }
-
-    // Next Quote Timer Methods
-    startNextQuoteTimer() {
-        // Only show timer for today's quote when puzzle is complete
-        if (!this.isTodayQuote() || !this.gameComplete) {
-            this.hideTimer();
-            return;
-        }
-
-        this.showTimer();
-        this.updateTimer();
-        
-        // Update timer every second
-        this.timerInterval = setInterval(() => {
-            this.updateTimer();
-        }, 1000);
-    }
-
-    isTodayQuote() {
-        const today = new Date();
-        const todayStr = this.formatDate(today);
-        return this.currentQuote && this.currentQuote.date === todayStr;
-    }
-
-    showTimer() {
-        if (this.elements.nextQuoteTimer) {
-            this.elements.nextQuoteTimer.classList.remove('hidden');
-        }
-    }
-
-    hideTimer() {
-        if (this.elements.nextQuoteTimer) {
-            this.elements.nextQuoteTimer.classList.add('hidden');
-        }
-    }
-
-    updateTimer() {
-        const now = new Date();
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0); // Set to midnight
-
-        const timeUntilNextQuote = tomorrow - now;
-        
-        if (timeUntilNextQuote <= 0) {
-            // It's past midnight, refresh the page to get the new quote
-            this.hideTimer();
-            return;
-        }
-
-        const hours = Math.floor(timeUntilNextQuote / (1000 * 60 * 60));
-        const minutes = Math.floor((timeUntilNextQuote % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeUntilNextQuote % (1000 * 60)) / 1000);
-
-        // Update timer display
-        if (this.elements.timerHours) {
-            this.elements.timerHours.textContent = hours.toString().padStart(2, '0');
-        }
-        if (this.elements.timerMinutes) {
-            this.elements.timerMinutes.textContent = minutes.toString().padStart(2, '0');
-        }
-        if (this.elements.timerSeconds) {
-            this.elements.timerSeconds.textContent = seconds.toString().padStart(2, '0');
-        }
-    }
-
-    stopTimer() {
-        if (this.timerInterval) {
-            clearInterval(this.timerInterval);
-            this.timerInterval = null;
-        }
     }
 
     // replayPastChallenge method removed - no longer needed since completed challenges are view-only

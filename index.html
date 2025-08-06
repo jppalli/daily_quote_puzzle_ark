@@ -47,7 +47,6 @@
         .header {
             position: relative;
             padding-bottom: 15px;
-            border-bottom: 2px solid #222;
             margin-bottom: 20px;
             flex-shrink: 0;
         }
@@ -131,14 +130,14 @@
             justify-content: center;
             align-items: center;
             min-height: 200px;
-            max-height: calc(100vh - 350px);
+            max-height: calc(100vh - 300px);
             overflow-y: auto;
         }
 
         .quote-container:before,
         .quote-container:after {
-            content: """;
-            position: absolute;
+            content: "" ";
+ position: absolute;
             font-size: 80px;
             color: #ddd;
             font-family: Georgia, serif;
@@ -2173,130 +2172,14 @@
                 border-radius: 3px;
             }
 
-                    /* Ultra small mobile CTA button adjustments */
+            /* Ultra small mobile CTA button adjustments */
 
-        .btn {
-            padding: 3px 6px;
-            font-size: 10px;
-            min-height: 28px;
-            min-width: 40px;
-        }
-
-        /* Next Quote Timer Styles - Now integrated into stats box */
-        .next-quote-timer {
-            /* Inherit stat-item styling */
-            background: #fff;
-            border: 1px solid #222;
-            padding: 10px 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            min-width: 80px;
-            transition: all 0.2s;
-        }
-
-        .next-quote-timer:hover {
-            background: #f5f5f5;
-        }
-
-        .next-quote-timer .stat-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: #222;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 1px;
-            text-align: center;
-        }
-
-        .next-quote-timer .stat-value span {
-            background: #f0f0f0;
-            padding: 2px 4px;
-            border-radius: 3px;
-            border: 1px solid #ddd;
-            margin: 0 1px;
-            min-width: 20px;
-            display: inline-block;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .next-quote-timer .stat-label {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 0;
-        }
-
-        /* Hide timer when viewing past quotes or when puzzle is complete */
-        .next-quote-timer.hidden {
-            display: none;
-        }
-
-        /* Mobile responsive timer */
-        @media (max-width: 768px) {
-            .next-quote-timer {
-                padding: 8px 12px;
-                min-width: 70px;
-            }
-
-            .next-quote-timer .stat-value {
-                font-size: 14px;
-            }
-
-            .next-quote-timer .stat-value span {
-                padding: 1px 3px;
-                min-width: 18px;
-                font-size: 12px;
-            }
-
-            .next-quote-timer .stat-label {
+            .btn {
+                padding: 3px 6px;
                 font-size: 10px;
+                min-height: 28px;
+                min-width: 40px;
             }
-        }
-
-        @media (max-width: 480px) {
-            .next-quote-timer {
-                padding: 6px 10px;
-                min-width: 60px;
-            }
-
-            .next-quote-timer .stat-value {
-                font-size: 12px;
-            }
-
-            .next-quote-timer .stat-value span {
-                padding: 1px 2px;
-                min-width: 16px;
-                font-size: 11px;
-            }
-
-            .next-quote-timer .stat-label {
-                font-size: 9px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .next-quote-timer {
-                padding: 4px 8px;
-                min-width: 50px;
-            }
-
-            .next-quote-timer .stat-value {
-                font-size: 11px;
-            }
-
-            .next-quote-timer .stat-value span {
-                padding: 1px 2px;
-                min-width: 14px;
-                font-size: 10px;
-            }
-
-            .next-quote-timer .stat-label {
-                font-size: 8px;
-            }
-        }
 
             .quote-word.scrambled {
                 padding: 1px 3px;
@@ -2599,15 +2482,6 @@
                     <div class="stat-value" id="congratsMaxStreak">0</div>
                     <div class="stat-label">Max Streak</div>
                 </div>
-                <!-- Timer countdown for next quote -->
-                <div class="stat-item next-quote-timer hidden" id="nextQuoteTimer">
-                    <div class="stat-value">
-                        <span class="timer-hours" id="timerHours">00</span>h
-                        <span class="timer-minutes" id="timerMinutes">00</span>m
-                        <span class="timer-seconds" id="timerSeconds">00</span>s
-                    </div>
-                    <div class="stat-label">Next Quote</div>
-                </div>
             </div>
 
             <div class="congrats-cta">
@@ -2809,6 +2683,7 @@
 
     <!-- Load quotes from external file -->
     <script src="quotes_calendar.js"></script>
+    <script src="quote-manager.js"></script>
     <script src="arkadium-integration.js"></script>
     <script src="game-modern.js"></script>
 </body>
