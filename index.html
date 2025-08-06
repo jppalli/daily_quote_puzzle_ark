@@ -231,6 +231,8 @@
             flex-shrink: 0;
             text-align: center;
             margin-top: auto;
+            position: relative;
+            z-index: 10;
         }
 
         .congrats.show {
@@ -377,11 +379,20 @@
             gap: 8px;
             text-decoration: none;
             color: #222;
+            position: relative;
+            z-index: 20;
+            pointer-events: auto;
         }
 
         .cta-button:hover {
             background: #222;
             color: white;
+            transform: scale(1.05);
+        }
+
+        .cta-button:active {
+            transform: scale(0.95);
+            background: #444;
         }
 
         .input-area {

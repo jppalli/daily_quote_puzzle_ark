@@ -1239,6 +1239,9 @@ class DailyQuotePuzzle {
                 this.setupCongratsButtons();
             }, 100);
             
+            // Also set up event delegation as backup
+            this.setupCongratsEventDelegation();
+            
             this.playQuoteCompleteSound();
             
             const quoteContainer = document.querySelector('.quote-container');
@@ -2339,61 +2342,120 @@ class DailyQuotePuzzle {
     }
 
     setupCongratsButtons() {
-        // Past challenges button in congrats section with mobile touch handling
-        const pastChallengesBtn = document.getElementById('pastChallengesBtn');
-        console.log('🔍 Past challenges button found:', !!pastChallengesBtn);
-        if (pastChallengesBtn) {
-            // Remove any existing event listeners
-            pastChallengesBtn.replaceWith(pastChallengesBtn.cloneNode(true));
-            const newPastChallengesBtn = document.getElementById('pastChallengesBtn');
+        console.log('🔧 Setting up congrats buttons...');
+        
+        // Use a more direct approach - wait for elements to be available
+        setTimeout(() => {
+            // Past challenges button
+            const pastChallengesBtn = document.getElementById('pastChallengesBtn');
+            console.log('🔍 Past challenges button found:', !!pastChallengesBtn);
+            console.log('🔍 Button visible:', pastChallengesBtn ? window.getComputedStyle(pastChallengesBtn).display !== 'none' : false);
             
-            // Add both mobile touch handling and regular click event
-            this.addMobileTouchHandling(newPastChallengesBtn, async (e) => {
-                console.log('📅 Past challenges button clicked (mobile)!');
-                e.preventDefault();
-                // Just open the calendar modal without changing the current display
-                this.elements.calendarModal.style.display = 'flex';
-                await this.renderCalendar();
-                this.playButtonClickSound();
-            });
-            
-            // Fallback regular click event
-            newPastChallengesBtn.addEventListener('click', async (e) => {
-                console.log('📅 Past challenges button clicked (regular)!');
-                e.preventDefault();
-                this.elements.calendarModal.style.display = 'flex';
-                await this.renderCalendar();
-                this.playButtonClickSound();
-            });
-        }
+            if (pastChallengesBtn) {
+                // Simple click event without mobile touch handling first
+                pastChallengesBtn.onclick = async (e) => {
+                    console.log('📅 Past challenges button clicked!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    try {
+                        this.elements.calendarModal.style.display = 'flex';
+                        await this.renderCalendar();
+                        this.playButtonClickSound();
+                    } catch (error) {
+                        console.error('Error opening calendar:', error);
+                    }
+                };
+                
+                // Also add addEventListener as backup
+                pastChallengesBtn.addEventListener('click', async (e) => {
+                    console.log('📅 Past challenges button clicked (addEventListener)!');
+                }, { once: false });
+                
+                // Add hover events to test if button is receiving events
+                pastChallengesBtn.addEventListener('mouseenter', () => {
+                    console.log('🖱️ Mouse entered past challenges button');
+                });
+                
+                pastChallengesBtn.addEventListener('mouseleave', () => {
+                    console.log('🖱️ Mouse left past challenges button');
+                });
+            }
 
-        // Share button in congrats section with mobile touch handling
-        const shareFromCongratsBtn = document.getElementById('shareFromCongratsBtn');
-        console.log('🔍 Share button found:', !!shareFromCongratsBtn);
-        if (shareFromCongratsBtn) {
-            // Remove any existing event listeners
-            shareFromCongratsBtn.replaceWith(shareFromCongratsBtn.cloneNode(true));
-            const newShareFromCongratsBtn = document.getElementById('shareFromCongratsBtn');
+            // Share button
+            const shareFromCongratsBtn = document.getElementById('shareFromCongratsBtn');
+            console.log('🔍 Share button found:', !!shareFromCongratsBtn);
+            console.log('🔍 Button visible:', shareFromCongratsBtn ? window.getComputedStyle(shareFromCongratsBtn).display !== 'none' : false);
             
-            // Add both mobile touch handling and regular click event
-            this.addMobileTouchHandling(newShareFromCongratsBtn, (e) => {
-                console.log('📤 Share button clicked (mobile)!');
-                e.preventDefault();
-                // Get today's date for sharing the current completed puzzle
-                const today = new Date();
-                const todayStr = this.formatDate(today);
-                this.shareQuote(todayStr);
-                this.playButtonClickSound();
-            });
-            
-            // Fallback regular click event
-            newShareFromCongratsBtn.addEventListener('click', (e) => {
-                console.log('📤 Share button clicked (regular)!');
-                e.preventDefault();
-                const today = new Date();
-                const todayStr = this.formatDate(today);
-                this.shareQuote(todayStr);
-                this.playButtonClickSound();
+            if (shareFromCongratsBtn) {
+                // Simple click event without mobile touch handling first
+                shareFromCongratsBtn.onclick = (e) => {
+                    console.log('📤 Share button clicked!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    try {
+                        const today = new Date();
+                        const todayStr = this.formatDate(today);
+                        this.shareQuote(todayStr);
+                        this.playButtonClickSound();
+                    } catch (error) {
+                        console.error('Error sharing quote:', error);
+                    }
+                };
+                
+                // Also add addEventListener as backup
+                shareFromCongratsBtn.addEventListener('click', (e) => {
+                    console.log('📤 Share button clicked (addEventListener)!');
+                }, { once: false });
+                
+                // Add hover events to test if button is receiving events
+                shareFromCongratsBtn.addEventListener('mouseenter', () => {
+                    console.log('🖱️ Mouse entered share button');
+                });
+                
+                shareFromCongratsBtn.addEventListener('mouseleave', () => {
+                    console.log('🖱️ Mouse left share button');
+                });
+            }
+        }, 200); // Increased delay to ensure DOM is ready
+    }
+
+    setupCongratsEventDelegation() {
+        // Set up event delegation on the congrats container
+        const congratsContainer = document.getElementById('congrats');
+        if (congratsContainer) {
+            congratsContainer.addEventListener('click', async (e) => {
+                console.log('🎯 Click detected in congrats container:', e.target.id);
+                
+                if (e.target.id === 'pastChallengesBtn' || e.target.closest('#pastChallengesBtn')) {
+                    console.log('📅 Past challenges clicked via delegation!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    try {
+                        this.elements.calendarModal.style.display = 'flex';
+                        await this.renderCalendar();
+                        this.playButtonClickSound();
+                    } catch (error) {
+                        console.error('Error opening calendar via delegation:', error);
+                    }
+                }
+                
+                if (e.target.id === 'shareFromCongratsBtn' || e.target.closest('#shareFromCongratsBtn')) {
+                    console.log('📤 Share clicked via delegation!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    try {
+                        const today = new Date();
+                        const todayStr = this.formatDate(today);
+                        this.shareQuote(todayStr);
+                        this.playButtonClickSound();
+                    } catch (error) {
+                        console.error('Error sharing via delegation:', error);
+                    }
+                }
             });
         }
     }
