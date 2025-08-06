@@ -131,7 +131,7 @@
             justify-content: center;
             align-items: center;
             min-height: 200px;
-            max-height: calc(100vh - 300px);
+            max-height: calc(100vh - 350px);
             overflow-y: auto;
         }
 
@@ -254,24 +254,24 @@
 
         /* Adjust quote container when puzzle is complete */
         .puzzle-complete .quote-container {
-            max-height: calc(100vh - 300px);
+            max-height: calc(100vh - 350px);
         }
 
         @media (max-width: 768px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 270px);
+                max-height: calc(100vh - 320px);
             }
         }
 
         @media (max-width: 480px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 230px);
+                max-height: calc(100vh - 280px);
             }
         }
 
         @media (max-width: 360px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 200px);
+                max-height: calc(100vh - 250px);
             }
         }
 
@@ -2173,14 +2173,137 @@
                 border-radius: 3px;
             }
 
-            /* Ultra small mobile CTA button adjustments */
+                    /* Ultra small mobile CTA button adjustments */
 
-            .btn {
-                padding: 3px 6px;
-                font-size: 10px;
-                min-height: 28px;
-                min-width: 40px;
+        .btn {
+            padding: 3px 6px;
+            font-size: 10px;
+            min-height: 28px;
+            min-width: 40px;
+        }
+
+        /* Next Quote Timer Styles */
+        .next-quote-timer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #222;
+            border-radius: 8px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            font-family: 'Special Elite', 'Courier New', monospace;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .next-quote-timer:hover {
+            transform: translateX(-50%) scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .timer-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            white-space: nowrap;
+        }
+
+        .timer-display {
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .timer-display span {
+            background: #f0f0f0;
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin: 0 2px;
+            min-width: 30px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* Hide timer when viewing past quotes or when puzzle is complete */
+        .next-quote-timer.hidden {
+            display: none;
+        }
+
+        /* Mobile responsive timer */
+        @media (max-width: 768px) {
+            .next-quote-timer {
+                bottom: 15px;
+                padding: 10px 16px;
+                gap: 8px;
             }
+
+            .timer-label {
+                font-size: 12px;
+            }
+
+            .timer-display {
+                font-size: 14px;
+            }
+
+            .timer-display span {
+                padding: 3px 5px;
+                min-width: 25px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .next-quote-timer {
+                bottom: 10px;
+                padding: 8px 12px;
+                gap: 6px;
+            }
+
+            .timer-label {
+                font-size: 11px;
+            }
+
+            .timer-display {
+                font-size: 12px;
+            }
+
+            .timer-display span {
+                padding: 2px 4px;
+                min-width: 22px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .next-quote-timer {
+                bottom: 8px;
+                padding: 6px 10px;
+                gap: 4px;
+            }
+
+            .timer-label {
+                font-size: 10px;
+            }
+
+            .timer-display {
+                font-size: 11px;
+            }
+
+            .timer-display span {
+                padding: 1px 3px;
+                min-width: 20px;
+                font-size: 10px;
+            }
+        }
 
             .quote-word.scrambled {
                 padding: 1px 3px;
@@ -2494,6 +2617,16 @@
                         <i class="fas fa-share"></i> Share Quote
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Timer countdown for next quote -->
+        <div class="next-quote-timer hidden" id="nextQuoteTimer">
+            <div class="timer-label">Next Quote In:</div>
+            <div class="timer-display">
+                <span class="timer-hours" id="timerHours">00</span>h
+                <span class="timer-minutes" id="timerMinutes">00</span>m
+                <span class="timer-seconds" id="timerSeconds">00</span>s
             </div>
         </div>
 
