@@ -202,7 +202,13 @@ class DailyQuotePuzzle {
         this.updateDateDisplay();
         this.renderInputArea();
         this.setupEventListeners();
-        this.startNextQuoteTimer();
+        
+        // Start timer only if this is today's quote
+        if (this.isTodayQuote()) {
+            this.startNextQuoteTimer();
+        } else {
+            this.hideTimer();
+        }
 
         // Clean up timer when page is unloaded
         window.addEventListener('beforeunload', () => {

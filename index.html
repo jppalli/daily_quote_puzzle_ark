@@ -130,7 +130,7 @@
             justify-content: center;
             align-items: center;
             min-height: 200px;
-            max-height: calc(100vh - 300px);
+            max-height: calc(100vh - 350px);
             overflow-y: auto;
         }
 
@@ -253,24 +253,24 @@
 
         /* Adjust quote container when puzzle is complete */
         .puzzle-complete .quote-container {
-            max-height: calc(100vh - 350px);
+            max-height: calc(100vh - 400px);
         }
 
         @media (max-width: 768px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 320px);
+                max-height: calc(100vh - 370px);
             }
         }
 
         @media (max-width: 480px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 280px);
+                max-height: calc(100vh - 330px);
             }
         }
 
         @media (max-width: 360px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 250px);
+                max-height: calc(100vh - 300px);
             }
         }
 
@@ -2620,7 +2620,7 @@
         </div>
 
         <!-- Timer countdown for next quote -->
-        <div class="next-quote-timer" id="nextQuoteTimer">
+        <div class="next-quote-timer hidden" id="nextQuoteTimer">
             <div class="timer-label">Next Quote In:</div>
             <div class="timer-display">
                 <span class="timer-hours" id="timerHours">00</span>h
