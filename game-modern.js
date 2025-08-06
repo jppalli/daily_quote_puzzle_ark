@@ -1232,6 +1232,7 @@ class DailyQuotePuzzle {
             await this.updateCongratsStats();
             
             this.elements.congrats.classList.add('show');
+            document.querySelector('.newspaper-container').classList.add('puzzle-complete');
             this.playQuoteCompleteSound();
             
             const quoteContainer = document.querySelector('.quote-container');
@@ -1671,6 +1672,7 @@ class DailyQuotePuzzle {
                 
                 // Hide congrats section when selecting any date from calendar
                 this.elements.congrats.classList.remove('show');
+                document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
                 
                 // If clicking on today's date, load today's puzzle properly
                 if (dateStr === todayStr) {
@@ -1915,6 +1917,7 @@ class DailyQuotePuzzle {
                 // Hide input area and congrats for completed past challenges
                 this.elements.inputArea.classList.remove('show');
                 this.elements.congrats.classList.remove('show');
+                document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
                 
                 const quoteContainer = document.querySelector('.quote-container');
                 quoteContainer.classList.add('quote-complete');
@@ -1952,6 +1955,7 @@ class DailyQuotePuzzle {
                     this.startTime = new Date();
                     
                     this.elements.congrats.classList.remove('show');
+                    document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
                     this.hideCompletedChallengeButtons();
                     this.renderQuote();
                     this.updateDateDisplay();
@@ -1983,6 +1987,7 @@ class DailyQuotePuzzle {
                     this.startTime = new Date();
                     
                     this.elements.congrats.classList.remove('show');
+                    document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
                     this.hideCompletedChallengeButtons();
                     this.renderQuote();
                     this.updateDateDisplay();
@@ -2387,6 +2392,7 @@ class DailyQuotePuzzle {
             // Hide input area and congrats for completed challenges (same as past challenges)
             this.elements.inputArea.classList.remove('show');
             this.elements.congrats.classList.remove('show');
+            document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
 
             const quoteContainer = document.querySelector('.quote-container');
             quoteContainer.classList.add('quote-complete');

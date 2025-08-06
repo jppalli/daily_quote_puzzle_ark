@@ -42,7 +42,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            justify-content: space-between;
         }
 
         .header {
@@ -118,14 +117,15 @@
 
         .quote-container {
             padding: 20px 0;
-            margin-bottom: 20px;
             position: relative;
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 0;
+            min-height: 200px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
         }
 
         .quote-container:before,
@@ -223,19 +223,47 @@
             padding: 20px;
             background: #f9f9f9;
             border: 1px solid #ddd;
-            margin-bottom: 20px;
             width: 100%;
             max-width: 800px;
-            margin: 0 auto;
+            margin: 0 auto 20px auto;
             min-height: 180px;
             display: none;
             flex-shrink: 0;
             text-align: center;
+            margin-top: auto;
         }
 
         .congrats.show {
             display: block;
             animation: fadeIn 0.5s;
+        }
+
+        /* Ensure proper spacing when congrats is shown */
+        .congrats.show ~ .input-area {
+            display: none;
+        }
+
+        /* Adjust quote container when puzzle is complete */
+        .puzzle-complete .quote-container {
+            max-height: calc(100vh - 350px);
+        }
+
+        @media (max-width: 768px) {
+            .puzzle-complete .quote-container {
+                max-height: calc(100vh - 320px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .puzzle-complete .quote-container {
+                max-height: calc(100vh - 280px);
+            }
+        }
+
+        @media (max-width: 360px) {
+            .puzzle-complete .quote-container {
+                max-height: calc(100vh - 250px);
+            }
         }
 
         .congrats h2 {
@@ -360,15 +388,15 @@
             padding: 20px;
             background: #f9f9f9;
             border: 1px solid #ddd;
-            margin-bottom: 20px;
             width: 100%;
             max-width: 800px;
-            margin: 0 auto;
+            margin: auto auto 20px auto;
             min-height: 180px;
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.3s ease-out;
             flex-shrink: 0;
+            margin-top: auto;
         }
 
         .input-area.show {
@@ -1532,6 +1560,18 @@
                 min-height: calc(100vh - 120px);
             }
 
+            .quote-container {
+                padding: 10px 0;
+                min-height: 150px;
+                max-height: calc(100vh - 280px);
+            }
+
+            .quote-text {
+                font-size: 18px;
+                line-height: 1.6;
+                padding: 0 10px;
+            }
+
             .header {
                 padding-bottom: 12px;
                 margin-bottom: 12px;
@@ -1809,7 +1849,8 @@
 
             .quote-container {
                 padding: 8px 0;
-                margin-bottom: 8px;
+                min-height: 120px;
+                max-height: calc(100vh - 250px);
             }
 
             .quote-text {
@@ -2009,7 +2050,8 @@
 
             .quote-container {
                 padding: 6px 0;
-                margin-bottom: 6px;
+                min-height: 100px;
+                max-height: calc(100vh - 220px);
             }
 
             /* Improved Quote Layout When Completed for Ultra Small Mobile */
