@@ -2183,26 +2183,26 @@
 
         /* Next Quote Timer Styles */
         .next-quote-timer {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            margin-top: 20px;
             background: rgba(255, 255, 255, 0.95);
             border: 2px solid #222;
             border-radius: 8px;
             padding: 12px 20px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 100;
             font-family: 'Special Elite', 'Courier New', monospace;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .next-quote-timer:hover {
-            transform: translateX(-50%) scale(1.02);
+            transform: scale(1.02);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
 
@@ -2240,7 +2240,7 @@
         /* Mobile responsive timer */
         @media (max-width: 768px) {
             .next-quote-timer {
-                bottom: 15px;
+                margin-top: 15px;
                 padding: 10px 16px;
                 gap: 8px;
             }
@@ -2262,7 +2262,7 @@
 
         @media (max-width: 480px) {
             .next-quote-timer {
-                bottom: 10px;
+                margin-top: 12px;
                 padding: 8px 12px;
                 gap: 6px;
             }
@@ -2284,7 +2284,7 @@
 
         @media (max-width: 360px) {
             .next-quote-timer {
-                bottom: 8px;
+                margin-top: 10px;
                 padding: 6px 10px;
                 gap: 4px;
             }
@@ -2616,6 +2616,15 @@
                         <i class="fas fa-share"></i> Share Quote
                     </button>
                 </div>
+                <!-- Timer countdown for next quote -->
+                <div class="next-quote-timer" id="nextQuoteTimer">
+                    <div class="timer-label">Next Quote In:</div>
+                    <div class="timer-display">
+                        <span class="timer-hours" id="timerHours">00</span>h
+                        <span class="timer-minutes" id="timerMinutes">00</span>m
+                        <span class="timer-seconds" id="timerSeconds">00</span>s
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2635,16 +2644,6 @@
                     <span class="ad-indicator">Watch Ad</span>
                     <span class="cooldown-timer" id="unscrambleTimer"></span>
                 </button>
-            </div>
-        </div>
-
-        <!-- Timer countdown for next quote -->
-        <div class="next-quote-timer" id="nextQuoteTimer">
-            <div class="timer-label">Next Quote In:</div>
-            <div class="timer-display">
-                <span class="timer-hours" id="timerHours">00</span>h
-                <span class="timer-minutes" id="timerMinutes">00</span>m
-                <span class="timer-seconds" id="timerSeconds">00</span>s
             </div>
         </div>
     </div>
