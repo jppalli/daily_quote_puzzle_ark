@@ -2182,55 +2182,51 @@
             min-width: 40px;
         }
 
-        /* Next Quote Timer Styles */
+        /* Next Quote Timer Styles - Now integrated into stats box */
         .next-quote-timer {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid #222;
-            border-radius: 8px;
-            padding: 12px 20px;
+            /* Inherit stat-item styling */
+            background: #fff;
+            border: 1px solid #222;
+            padding: 10px 15px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 100;
-            font-family: 'Special Elite', 'Courier New', monospace;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            gap: 5px;
+            min-width: 80px;
+            transition: all 0.2s;
         }
 
         .next-quote-timer:hover {
-            transform: translateX(-50%) scale(1.02);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            background: #f5f5f5;
         }
 
-        .timer-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #222;
-            white-space: nowrap;
-        }
-
-        .timer-display {
+        .next-quote-timer .stat-value {
             font-size: 16px;
             font-weight: 700;
             color: #222;
             font-family: 'Courier New', monospace;
             letter-spacing: 1px;
+            text-align: center;
         }
 
-        .timer-display span {
+        .next-quote-timer .stat-value span {
             background: #f0f0f0;
-            padding: 4px 6px;
-            border-radius: 4px;
+            padding: 2px 4px;
+            border-radius: 3px;
             border: 1px solid #ddd;
-            margin: 0 2px;
-            min-width: 30px;
+            margin: 0 1px;
+            min-width: 20px;
             display: inline-block;
             text-align: center;
+            font-size: 14px;
+        }
+
+        .next-quote-timer .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
         }
 
         /* Hide timer when viewing past quotes or when puzzle is complete */
@@ -2241,67 +2237,64 @@
         /* Mobile responsive timer */
         @media (max-width: 768px) {
             .next-quote-timer {
-                bottom: 15px;
-                padding: 10px 16px;
-                gap: 8px;
+                padding: 8px 12px;
+                min-width: 70px;
             }
 
-            .timer-label {
-                font-size: 12px;
-            }
-
-            .timer-display {
+            .next-quote-timer .stat-value {
                 font-size: 14px;
             }
 
-            .timer-display span {
-                padding: 3px 5px;
-                min-width: 25px;
+            .next-quote-timer .stat-value span {
+                padding: 1px 3px;
+                min-width: 18px;
                 font-size: 12px;
+            }
+
+            .next-quote-timer .stat-label {
+                font-size: 10px;
             }
         }
 
         @media (max-width: 480px) {
             .next-quote-timer {
-                bottom: 10px;
-                padding: 8px 12px;
-                gap: 6px;
+                padding: 6px 10px;
+                min-width: 60px;
             }
 
-            .timer-label {
-                font-size: 11px;
-            }
-
-            .timer-display {
+            .next-quote-timer .stat-value {
                 font-size: 12px;
             }
 
-            .timer-display span {
-                padding: 2px 4px;
-                min-width: 22px;
+            .next-quote-timer .stat-value span {
+                padding: 1px 2px;
+                min-width: 16px;
                 font-size: 11px;
+            }
+
+            .next-quote-timer .stat-label {
+                font-size: 9px;
             }
         }
 
         @media (max-width: 360px) {
             .next-quote-timer {
-                bottom: 8px;
-                padding: 6px 10px;
-                gap: 4px;
+                padding: 4px 8px;
+                min-width: 50px;
             }
 
-            .timer-label {
-                font-size: 10px;
-            }
-
-            .timer-display {
+            .next-quote-timer .stat-value {
                 font-size: 11px;
             }
 
-            .timer-display span {
-                padding: 1px 3px;
-                min-width: 20px;
+            .next-quote-timer .stat-value span {
+                padding: 1px 2px;
+                min-width: 14px;
                 font-size: 10px;
+            }
+
+            .next-quote-timer .stat-label {
+                font-size: 8px;
             }
         }
 
@@ -2606,6 +2599,15 @@
                     <div class="stat-value" id="congratsMaxStreak">0</div>
                     <div class="stat-label">Max Streak</div>
                 </div>
+                <!-- Timer countdown for next quote -->
+                <div class="stat-item next-quote-timer hidden" id="nextQuoteTimer">
+                    <div class="stat-value">
+                        <span class="timer-hours" id="timerHours">00</span>h
+                        <span class="timer-minutes" id="timerMinutes">00</span>m
+                        <span class="timer-seconds" id="timerSeconds">00</span>s
+                    </div>
+                    <div class="stat-label">Next Quote</div>
+                </div>
             </div>
 
             <div class="congrats-cta">
@@ -2617,16 +2619,6 @@
                         <i class="fas fa-share"></i> Share Quote
                     </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Timer countdown for next quote -->
-        <div class="next-quote-timer hidden" id="nextQuoteTimer">
-            <div class="timer-label">Next Quote In:</div>
-            <div class="timer-display">
-                <span class="timer-hours" id="timerHours">00</span>h
-                <span class="timer-minutes" id="timerMinutes">00</span>m
-                <span class="timer-seconds" id="timerSeconds">00</span>s
             </div>
         </div>
 

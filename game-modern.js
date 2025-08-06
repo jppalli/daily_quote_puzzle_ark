@@ -203,12 +203,8 @@ class DailyQuotePuzzle {
         this.renderInputArea();
         this.setupEventListeners();
         
-        // Start timer only if this is today's quote
-        if (this.isTodayQuote()) {
-            this.startNextQuoteTimer();
-        } else {
-            this.hideTimer();
-        }
+        // Timer will be started when puzzle is complete and it's today's quote
+        this.hideTimer();
 
         // Clean up timer when page is unloaded
         window.addEventListener('beforeunload', () => {
@@ -762,6 +758,14 @@ class DailyQuotePuzzle {
         document.getElementById('congratsWinRate').textContent = `${winRate}%`;
         document.getElementById('congratsCurrentStreak').textContent = stats.currentStreak;
         document.getElementById('congratsMaxStreak').textContent = stats.maxStreak;
+
+        // Handle timer visibility in congrats section
+        if (this.isTodayQuote()) {
+            this.showTimer();
+            this.updateTimer();
+        } else {
+            this.hideTimer();
+        }
     }
 
     updateDateDisplay() {
@@ -1734,7 +1738,7 @@ class DailyQuotePuzzle {
                 
                 // Update timer based on selected date
                 this.stopTimer(); // Stop any existing timer
-                if (this.isTodayQuote()) {
+                if (this.isTodayQuote() && this.gameComplete) {
                     this.startNextQuoteTimer();
                 } else {
                     this.hideTimer();
@@ -2086,7 +2090,7 @@ class DailyQuotePuzzle {
 
         // Update timer visibility based on whether this is today's quote
         this.stopTimer(); // Stop any existing timer
-        if (this.isTodayQuote()) {
+        if (this.isTodayQuote() && this.gameComplete) {
             this.startNextQuoteTimer();
         } else {
             this.hideTimer();
@@ -2313,7 +2317,7 @@ class DailyQuotePuzzle {
                 this.elements.calendarModal.style.display = 'none';
                 // Restart timer when returning to today's quote
                 this.stopTimer(); // Stop any existing timer
-                if (this.isTodayQuote()) {
+                if (this.isTodayQuote() && this.gameComplete) {
                     this.startNextQuoteTimer();
                 } else {
                     this.hideTimer();
@@ -2685,7 +2689,7 @@ class DailyQuotePuzzle {
 
         // Restart timer when returning to today's quote
         this.stopTimer(); // Stop any existing timer
-        if (this.isTodayQuote()) {
+        if (this.isTodayQuote() && this.gameComplete) {
             this.startNextQuoteTimer();
         } else {
             this.hideTimer();
@@ -2797,8 +2801,8 @@ Check console for detailed logs.`;
 
     // Next Quote Timer Methods
     startNextQuoteTimer() {
-        // Only show timer for today's quote
-        if (!this.isTodayQuote()) {
+        // Only show timer for today's quote when puzzle is complete
+        if (!this.isTodayQuote() || !this.gameComplete) {
             this.hideTimer();
             return;
         }
