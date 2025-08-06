@@ -47,6 +47,7 @@
         .header {
             position: relative;
             padding-bottom: 15px;
+            border-bottom: 2px solid #222;
             margin-bottom: 20px;
             flex-shrink: 0;
         }
@@ -136,8 +137,8 @@
 
         .quote-container:before,
         .quote-container:after {
-            content: "" ";
- position: absolute;
+            content: """;
+            position: absolute;
             font-size: 80px;
             color: #ddd;
             font-family: Georgia, serif;
@@ -253,24 +254,24 @@
 
         /* Adjust quote container when puzzle is complete */
         .puzzle-complete .quote-container {
-            max-height: calc(100vh - 350px);
+            max-height: calc(100vh - 300px);
         }
 
         @media (max-width: 768px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 320px);
+                max-height: calc(100vh - 270px);
             }
         }
 
         @media (max-width: 480px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 280px);
+                max-height: calc(100vh - 230px);
             }
         }
 
         @media (max-width: 360px) {
             .puzzle-complete .quote-container {
-                max-height: calc(100vh - 250px);
+                max-height: calc(100vh - 200px);
             }
         }
 
