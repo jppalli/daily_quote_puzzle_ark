@@ -13,32 +13,32 @@ class DailyQuotePuzzle {
         this.startTime = null;
         this.endTime = null;
         this.gameTime = 0;
-        
+
         // User input state
         this.userInput = '';
         this.availableLetters = [];
         this.usedLetters = [];
-        
+
         // Settings
         this.soundEffectsEnabled = true;
         this.backgroundMusicEnabled = true;
-        
+
         // Unscramble cooldown system
         this.unscrambleCooldown = 60000; // 60 seconds in milliseconds
         this.unscrambleLastUsed = 0;
         this.unscrambleCooldownInterval = null;
-        
+
         // Calendar state
         this.currentCalendarMonth = new Date().getMonth();
         this.currentCalendarYear = new Date().getFullYear();
-        
+
         // PixiJS Application
         this.pixiApp = null;
         this.particleContainer = null;
-        
+
         // Sound system
         this.sounds = new Map();
-        
+
         // Music tracks system
         this.musicTracks = {
             track1: {
@@ -77,19 +77,19 @@ class DailyQuotePuzzle {
                 description: 'Epic orchestral puzzle themes'
             }
         };
-        
+
         this.currentMusicTrack = 'backgroundMusic';
-        
+
         // Arkadium SDK Integration
         this.arkadium = null;
-        
+
         // DOM Elements
         this.elements = this.initializeElements();
-        
+
         // Initialize the game
         this.init();
     }
-    
+
     initializeElements() {
         const elements = {
             quoteText: document.getElementById('quoteText'),
@@ -146,35 +146,35 @@ class DailyQuotePuzzle {
             calendarMonthYear: document.getElementById('calendarMonthYear'),
             pastChallengesBtn: document.getElementById('pastChallengesBtn')
         };
-        
+
         // Validate DOM elements are available
-        
+
         return elements;
     }
-    
+
     async init() {
         this.startTime = new Date();
         await this.initializePixiJS();
         await this.initializeSounds();
-        
+
         // Initialize Arkadium SDK
         this.arkadium = new ArkadiumIntegration();
-        
+
         // Notify SDK that game is ready to be shown
         if (this.arkadium.sdk) {
             this.arkadium.sdk.lifecycle.onTestReady();
         }
-        
+
         this.loadSettings();
-        this.loadMusicTracks();
+        // this.loadMusicTracks(); // Music selection disabled
         await this.loadUserData();
-        
+
         // Check for shared challenge in URL
         const sharedChallengeLoaded = await this.checkForSharedChallenge();
-        
+
         // Check for saved current puzzle state
         const savedCurrentPuzzle = await this.loadCurrentPuzzleState();
-        
+
         if (sharedChallengeLoaded) {
             // Shared challenge takes priority
             console.log('📤 Shared challenge loaded, ignoring saved state');
@@ -188,34 +188,34 @@ class DailyQuotePuzzle {
             this.currentQuote = this.findTodayQuote();
             await this.checkQuoteCompletionStatus();
         }
-        
+
         this.renderQuote();
         this.updateDateDisplay();
         this.renderInputArea();
         this.setupEventListeners();
-        
+
         // Ensure all modals are hidden
         if (this.elements.calendarModal) this.elements.calendarModal.style.display = 'none';
         if (this.elements.helpModal) this.elements.helpModal.style.display = 'none';
         if (this.elements.statsModal) this.elements.statsModal.style.display = 'none';
         if (this.elements.settingsModal) this.elements.settingsModal.style.display = 'none';
-        
+
         // Ensure all modals are properly hidden
-        
+
         // Auto-activate first word only if not already completed
         if (!(await this.isQuoteCompleted()) && this.currentQuote.scrambledWords.length > 0) {
             setTimeout(() => {
                 this.handleWordClick(this.currentQuote.scrambledWords[0]);
             }, 500);
         }
-        
+
         // Set up audio context and user interaction listeners for background music
         this.setupAudioContext();
-        
+
         // Check unscramble cooldown status
         this.checkUnscrambleCooldown();
     }
-    
+
     setupAudioContext() {
         // Create audio context for better audio handling
         try {
@@ -223,13 +223,13 @@ class DailyQuotePuzzle {
         } catch (error) {
             console.log('Could not create audio context:', error);
         }
-        
+
         // Add event listeners for user interaction to enable audio
         const enableAudio = this.enableAudioAfterInteraction.bind(this);
         document.addEventListener('click', enableAudio, { once: true });
         document.addEventListener('keydown', enableAudio, { once: true });
         document.addEventListener('touchstart', enableAudio, { once: true });
-        
+
         // Also try to start music after a delay (in case user has already interacted)
         setTimeout(() => {
             if (this.backgroundMusicEnabled) {
@@ -237,15 +237,15 @@ class DailyQuotePuzzle {
             }
         }, 2000);
     }
-    
 
-    
+
+
     async initializePixiJS() {
         // Temporarily disable PixiJS to avoid visual issues
         // Will be re-enabled when particle effects are implemented
         console.log('PixiJS initialization disabled for now');
         return;
-        
+
         // Original code commented out for future use:
         /*
         try {
@@ -310,7 +310,7 @@ class DailyQuotePuzzle {
         }
         */
     }
-    
+
     async initializeSounds() {
         const soundFiles = {
             keyType: 'sounds/keytype.mp3',
@@ -330,33 +330,33 @@ class DailyQuotePuzzle {
             backgroundMusic4: 'sounds/background-music.mp3', // Placeholder for now
             backgroundMusic5: 'sounds/background-music.mp3'  // Placeholder for now
         };
-        
+
         for (const [name, path] of Object.entries(soundFiles)) {
             try {
                 const audio = new Audio(path);
                 audio.preload = 'auto';
-                
+
                 if (name === 'backgroundMusic') {
                     audio.loop = true;
                     audio.volume = 0.2;
                 } else {
                     audio.volume = 0.5;
                 }
-                
+
                 audio.addEventListener('error', () => {
                     console.log(`Could not load sound: ${path}`);
                 });
-                
+
                 audio.addEventListener('canplaythrough', () => {
                     this.sounds.set(name, audio);
                 });
-                
+
             } catch (error) {
                 console.log(`Error loading sound ${name}:`, error);
             }
         }
     }
-    
+
     playSound(soundName, volume = 0.5) {
         try {
             const audio = this.sounds.get(soundName);
@@ -371,27 +371,27 @@ class DailyQuotePuzzle {
             console.log(`Error playing sound ${soundName}:`, error);
         }
     }
-    
+
     generateTypingSound() {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
+
             if (audioContext.state === 'suspended') {
                 audioContext.resume();
             }
-            
+
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
             oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
-            
+
             gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-            
+
             oscillator.type = 'square';
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.15);
@@ -399,58 +399,58 @@ class DailyQuotePuzzle {
             console.log('Could not generate typing sound:', error);
         }
     }
-    
+
     playTypingSound() {
         if (!this.soundEffectsEnabled) return;
-        
+
         if (this.sounds.has('keyType')) {
             this.playSound('keyType', 0.3);
         } else {
             this.generateTypingSound();
         }
     }
-    
+
     playWordCompleteSound() {
         this.playSound('wordComplete', 0.4);
     }
-    
+
     playAuthorCompleteSound() {
         this.playSound('authorComplete', 0.4);
     }
-    
+
     playPuzzleCompleteSound() {
         this.playSound('puzzleComplete', 0.6);
     }
-    
+
     playButtonClickSound() {
         this.playSound('buttonClick', 0.3);
     }
-    
+
     playWordActivateSound() {
         this.playSound('wordActivate', 0.3);
     }
-    
+
     playErrorSound() {
         this.playSound('error', 0.4);
     }
-    
+
     playCelebrationSound() {
         this.playSound('celebration', 0.5);
     }
-    
+
     playResetSound() {
         this.playSound('reset', 0.4);
     }
-    
+
     playBackspaceSound() {
         console.log('🎵 Playing backspace sound...');
         this.playSound('backspace', 0.4);
     }
-    
+
     playQuoteCompleteSound() {
         this.playSound('quoteComplete', 0.6);
     }
-    
+
     playBackgroundMusic() {
         try {
             const audio = this.sounds.get(this.currentMusicTrack);
@@ -466,25 +466,25 @@ class DailyQuotePuzzle {
             console.log('Error playing background music:', error);
         }
     }
-    
+
     // Method to enable audio after user interaction
     enableAudioAfterInteraction() {
         // Resume any suspended audio context
         if (window.audioContext && window.audioContext.state === 'suspended') {
             window.audioContext.resume();
         }
-        
+
         // Start background music if enabled
         if (this.backgroundMusicEnabled) {
             setTimeout(() => {
                 this.playBackgroundMusic();
             }, 100);
         }
-        
+
         // Remove the one-time event listeners (they should auto-remove with { once: true })
         console.log('Audio enabled after user interaction');
     }
-    
+
     pauseBackgroundMusic() {
         try {
             const audio = this.sounds.get(this.currentMusicTrack);
@@ -495,7 +495,7 @@ class DailyQuotePuzzle {
             console.log('Error pausing background music:', error);
         }
     }
-    
+
     toggleBackgroundMusic() {
         if (this.backgroundMusicEnabled) {
             const audio = this.sounds.get(this.currentMusicTrack);
@@ -506,7 +506,7 @@ class DailyQuotePuzzle {
             this.pauseBackgroundMusic();
         }
     }
-    
+
     saveSettings() {
         const settings = {
             soundEffectsEnabled: this.soundEffectsEnabled,
@@ -514,7 +514,7 @@ class DailyQuotePuzzle {
         };
         localStorage.setItem('dailyQuotePuzzleSettings', JSON.stringify(settings));
     }
-    
+
     loadSettings() {
         try {
             const savedSettings = localStorage.getItem('dailyQuotePuzzleSettings');
@@ -528,7 +528,7 @@ class DailyQuotePuzzle {
             this.soundEffectsEnabled = true;
             this.backgroundMusicEnabled = true;
         }
-        
+
         // Update both old and new toggle elements
         if (this.elements.soundEffectsToggle) {
             this.elements.soundEffectsToggle.checked = this.soundEffectsEnabled;
@@ -545,7 +545,7 @@ class DailyQuotePuzzle {
         // Don't auto-start background music due to browser autoplay restrictions
         // this.toggleBackgroundMusic();
     }
-    
+
     async loadUserData() {
         // Try to load from Arkadium remote persistence first
         if (this.arkadium && this.arkadium.isInitialized) {
@@ -559,7 +559,7 @@ class DailyQuotePuzzle {
                 console.error('❌ Failed to load from remote storage:', error);
             }
         }
-        
+
         // Fallback to local storage
         const userData = JSON.parse(localStorage.getItem('quotePuzzleUserData')) || {
             puzzles: {},
@@ -573,11 +573,11 @@ class DailyQuotePuzzle {
         };
         return userData;
     }
-    
+
     async saveUserData(userData) {
         // Save to local storage as backup
         localStorage.setItem('quotePuzzleUserData', JSON.stringify(userData));
-        
+
         // Save to Arkadium remote persistence
         if (this.arkadium && this.arkadium.isInitialized) {
             try {
@@ -591,7 +591,7 @@ class DailyQuotePuzzle {
 
     async saveCurrentPuzzleState() {
         if (!this.currentQuote) return;
-        
+
         try {
             const currentState = {
                 date: this.currentQuote.date,
@@ -603,7 +603,7 @@ class DailyQuotePuzzle {
                 usedLetters: this.usedLetters,
                 timestamp: Date.now()
             };
-            
+
             localStorage.setItem('dailyQuotePuzzleCurrentState', JSON.stringify(currentState));
             console.log('💾 Saved current puzzle state:', currentState.date);
         } catch (error) {
@@ -616,7 +616,7 @@ class DailyQuotePuzzle {
             const stateStr = localStorage.getItem('dailyQuotePuzzleCurrentState');
             if (stateStr) {
                 const state = JSON.parse(stateStr);
-                
+
                 // Check if the saved state is from today (if so, don't restore it)
                 const today = new Date();
                 const todayStr = this.formatDate(today);
@@ -625,7 +625,7 @@ class DailyQuotePuzzle {
                     localStorage.removeItem('dailyQuotePuzzleCurrentState');
                     return null;
                 }
-                
+
                 // Check if the saved state is too old (older than 7 days)
                 const sevenDaysAgo = new Date();
                 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -635,23 +635,23 @@ class DailyQuotePuzzle {
                     localStorage.removeItem('dailyQuotePuzzleCurrentState');
                     return null;
                 }
-                
+
                 console.log('📂 Found saved puzzle state:', state.date);
                 return state;
             }
         } catch (error) {
             console.error('Error loading current puzzle state:', error);
         }
-        
+
         return null;
     }
-    
+
     async recordPuzzleCompletion() {
         const userData = await this.loadUserData();
         const dateStr = this.currentQuote.date;
         this.endTime = new Date();
         this.gameTime = Math.floor((this.endTime - this.startTime) / 1000);
-        
+
         userData.puzzles[dateStr] = {
             solved: true,
             time: this.gameTime,
@@ -660,24 +660,24 @@ class DailyQuotePuzzle {
             authorSolved: this.authorSolved,
             completedAt: new Date().toISOString()
         };
-        
+
         // Update total solved count
         userData.stats.totalSolved = Object.values(userData.puzzles).filter(p => p.solved).length;
-        
+
         // Calculate current streak properly
         this.calculateCurrentStreak(userData);
-        
+
         // Update max streak if current streak is higher
         if (userData.stats.currentStreak > userData.stats.maxStreak) {
             userData.stats.maxStreak = userData.stats.currentStreak;
         }
-        
+
         // Update total time and recalculate average
         this.updateTotalTimeAndAverage(userData);
         userData.stats.lastPlayed = dateStr;
-        
+
         await this.saveUserData(userData);
-        
+
         // Clear saved puzzle state when puzzle is completed
         localStorage.removeItem('dailyQuotePuzzleCurrentState');
         console.log('🗑️ Cleared saved puzzle state after completion');
@@ -688,7 +688,7 @@ class DailyQuotePuzzle {
         const todayStr = this.formatDate(today);
         let currentStreak = 0;
         let checkDate = new Date(today);
-        
+
         // Count consecutive days backwards from today
         while (true) {
             const dateStr = this.formatDate(checkDate);
@@ -699,7 +699,7 @@ class DailyQuotePuzzle {
                 break;
             }
         }
-        
+
         userData.stats.currentStreak = currentStreak;
     }
 
@@ -708,18 +708,18 @@ class DailyQuotePuzzle {
         const completedPuzzles = Object.values(userData.puzzles).filter(p => p.solved);
         userData.stats.totalTime = completedPuzzles.reduce((total, puzzle) => total + (puzzle.time || 0), 0);
     }
-    
+
     async updateStatsDisplay() {
         const userData = await this.loadUserData();
-        
+
         // Recalculate streak and time to ensure accuracy
         this.calculateCurrentStreak(userData);
         this.updateTotalTimeAndAverage(userData);
-        
+
         const stats = userData.stats;
         const totalPlayed = Object.keys(userData.puzzles).length;
         const winRate = totalPlayed > 0 ? Math.round((stats.totalSolved / totalPlayed) * 100) : 0;
-        
+
         this.elements.played.textContent = totalPlayed;
         this.elements.winRate.textContent = `${winRate}%`;
         this.elements.currentStreak.textContent = stats.currentStreak;
@@ -728,21 +728,21 @@ class DailyQuotePuzzle {
 
     async updateCongratsStats() {
         const userData = await this.loadUserData();
-        
+
         // Recalculate streak and time to ensure accuracy
         this.calculateCurrentStreak(userData);
         this.updateTotalTimeAndAverage(userData);
-        
+
         const stats = userData.stats;
         const totalPlayed = Object.keys(userData.puzzles).length;
         const winRate = totalPlayed > 0 ? Math.round((stats.totalSolved / totalPlayed) * 100) : 0;
-        
+
         document.getElementById('congratsPlayed').textContent = totalPlayed;
         document.getElementById('congratsWinRate').textContent = `${winRate}%`;
         document.getElementById('congratsCurrentStreak').textContent = stats.currentStreak;
         document.getElementById('congratsMaxStreak').textContent = stats.maxStreak;
     }
-    
+
     updateDateDisplay() {
         // Only update date display if the element exists
         if (this.elements.dateLine) {
@@ -751,25 +751,25 @@ class DailyQuotePuzzle {
             this.elements.dateLine.textContent = date.toLocaleDateString('en-US', options);
         }
     }
-    
+
     formatDate(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
-    
+
     findTodayQuote() {
         const today = new Date();
         const todayStr = this.formatDate(today);
-        
+
         console.log('🔍 findTodayQuote() called');
         console.log('📅 Today:', todayStr);
         console.log('📚 Total quotes available:', this.quotes.length);
-        
+
         // Find today's quote
         const todayQuote = this.quotes.find(q => q.date === todayStr);
-        
+
         if (todayQuote) {
             console.log(`✅ Found today's quote for ${todayStr}: "${todayQuote.text}"`);
             return todayQuote;
@@ -779,27 +779,27 @@ class DailyQuotePuzzle {
             return this.quotes[0];
         }
     }
-    
+
     toTitleCase(str) {
         return str.replace(/\w\S*/g, (txt) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
         });
     }
-    
+
     getProperCapitalization(word, index, allWords) {
         const lowerWord = word.toLowerCase();
-        
+
         if (index === 0) {
             return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
         }
-        
+
         if (index > 0) {
             const prevWord = allWords[index - 1];
             if (prevWord && /[.!?]$/.test(prevWord.trim())) {
                 return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
             }
         }
-        
+
         const properNouns = [
             'jobs', 'steve', 'lennon', 'john', 'wilde', 'oscar', 'roosevelt', 'eleanor',
             'disney', 'walt', 'mandela', 'nelson', 'einstein', 'albert', 'gandhi', 'mahatma',
@@ -828,22 +828,22 @@ class DailyQuotePuzzle {
             'google', 'apple', 'microsoft', 'amazon', 'twitter', 'instagram', 'youtube',
             'netflix', 'disney', 'marvel', 'dc', 'batman', 'superman', 'spiderman'
         ];
-        
+
         if (properNouns.includes(lowerWord)) {
             return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
         }
-        
+
         if (lowerWord === 'i') {
             return 'I';
         }
-        
+
         return lowerWord;
     }
-    
+
     renderQuote() {
         const words = this.currentQuote.text.split(' ');
         let html = '';
-        
+
         // If game is complete (viewing a completed puzzle), show all words as solved
         if (this.gameComplete) {
             words.forEach((word, index) => {
@@ -855,23 +855,23 @@ class DailyQuotePuzzle {
             words.forEach((word, index) => {
                 const scrambledWord = this.currentQuote.scrambledWords.find(sw => sw.index === index);
                 const isSolved = scrambledWord && this.solvedWords.has(scrambledWord.original);
-                
+
                 if (scrambledWord && !isSolved) {
                     const isActive = this.activeWord && this.activeWord.original === scrambledWord.original;
                     html += `<span class="quote-word scrambled ${isActive ? 'active' : ''}" 
                                 data-word-index="${index}">${scrambledWord.scrambled}</span> `;
                 } else {
-                    const displayWord = isSolved ? 
-                        this.getProperCapitalization(scrambledWord.original, index, words) : 
+                    const displayWord = isSolved ?
+                        this.getProperCapitalization(scrambledWord.original, index, words) :
                         this.getProperCapitalization(word, index, words);
                     html += `<span class="quote-word">${displayWord}</span> `;
                 }
             });
         }
-        
+
         // Add quotation marks around the entire quote
         this.elements.quoteText.innerHTML = `"${html.trim()}"`;
-        
+
         // Only add click handlers if game is not complete
         if (!this.gameComplete) {
             document.querySelectorAll('.quote-word.scrambled').forEach(el => {
@@ -880,7 +880,7 @@ class DailyQuotePuzzle {
                 ));
             });
         }
-        
+
         // Handle author display
         if (this.authorSolved || this.gameComplete) {
             const authorName = this.toTitleCase(this.currentQuote.author);
@@ -898,17 +898,17 @@ class DailyQuotePuzzle {
             }
         }
     }
-    
+
     handleWordClick(wordData) {
         if (this.solvedWords.has(wordData.original) || this.isUnscrambling) return;
-        
+
         document.querySelectorAll('.quote-word.active').forEach(el => {
             el.classList.remove('active');
         });
         document.querySelectorAll('.author.active').forEach(el => {
             el.classList.remove('active');
         });
-        
+
         const wordElements = document.querySelectorAll('.quote-word');
         const targetWordEl = Array.from(wordElements).find(el =>
             el.dataset.wordIndex == wordData.index
@@ -916,52 +916,52 @@ class DailyQuotePuzzle {
         if (targetWordEl) {
             targetWordEl.classList.add('active');
         }
-        
+
         this.activeWord = wordData;
         this.userInput = '';
         this.availableLetters = wordData.scrambled.split('');
         this.usedLetters = [];
-        
+
         this.renderInputArea();
     }
-    
+
     handleAuthorClick() {
         if (this.authorSolved || this.isUnscrambling) return;
-        
+
         document.querySelectorAll('.quote-word.active').forEach(el => {
             el.classList.remove('active');
         });
         document.querySelectorAll('.author.active').forEach(el => {
             el.classList.remove('active');
         });
-        
+
         const authorEl = document.querySelector('.author.scrambled');
         if (authorEl) {
             authorEl.classList.add('active');
         }
-        
+
         this.activeWord = {
             original: this.currentQuote.author.toLowerCase(),
             scrambled: this.currentQuote.scrambledAuthor,
             isAuthor: true
         };
-        
+
         this.userInput = '';
         // For authors, keep all letters together without spaces and track word structure
         this.availableLetters = this.currentQuote.scrambledAuthor.replace(/\s/g, '').split('');
         this.authorWordStructure = this.currentQuote.author.split(' ').map(word => word.length);
         this.usedLetters = [];
-        
+
         this.renderInputArea();
     }
-    
+
     renderInputArea() {
         if (!this.activeWord) {
             if (this.solvedWords.size === this.currentQuote.scrambledWords.length && this.authorSolved) {
                 this.elements.inputArea.classList.remove('show');
                 return;
             }
-            
+
             const firstWord = this.currentQuote.scrambledWords.find(word => !this.solvedWords.has(word.original));
             if (firstWord) {
                 setTimeout(() => this.handleWordClick(firstWord), 100);
@@ -970,20 +970,20 @@ class DailyQuotePuzzle {
             }
             return;
         }
-        
+
         this.elements.inputArea.classList.add('show');
         this.elements.inputTitle.textContent = this.activeWord.isAuthor
             ? 'Unscramble Author'
             : 'Unscramble Word';
-        
+
         const targetLength = this.activeWord.original.length;
         this.elements.letterCells.innerHTML = '';
-        
+
         if (this.activeWord.isAuthor && this.authorWordStructure) {
             // For authors, create input boxes with gaps between word groups
             let userInputIndex = 0;
             let cellIndex = 0;
-            
+
             this.authorWordStructure.forEach((wordLength, wordIndex) => {
                 // Add cells for this word
                 for (let i = 0; i < wordLength; i++) {
@@ -994,7 +994,7 @@ class DailyQuotePuzzle {
                     userInputIndex++;
                     cellIndex++;
                 }
-                
+
                 // Add gap after each word except the last
                 if (wordIndex < this.authorWordStructure.length - 1) {
                     const gapCell = document.createElement('div');
@@ -1018,41 +1018,41 @@ class DailyQuotePuzzle {
                 this.elements.letterCells.appendChild(cell);
             }
         }
-        
+
         this.elements.availableLetters.innerHTML = '';
-        
+
         this.availableLetters.forEach((letter, index) => {
             const btn = document.createElement('div');
             btn.className = `letter-btn ${this.usedLetters.includes(index) ? 'used' : ''}`;
             btn.textContent = letter;
             btn.dataset.index = index;
-            
+
             if (!this.usedLetters.includes(index)) {
                 // Enhanced mobile touch handling
                 this.addMobileTouchHandling(btn, () => this.handleLetterClick(letter, index));
             }
-            
+
             this.elements.availableLetters.appendChild(btn);
         });
     }
-    
+
     // Add mobile-specific touch handling
     addMobileTouchHandling(element, callback) {
         let touchStartTime = 0;
         let touchStartY = 0;
         let touchStartX = 0;
         let isTouchMoved = false;
-        
+
         // Handle both click and touch events for better mobile responsiveness
         const handleInteraction = (event) => {
             // Prevent default behavior to avoid double-triggering
             event.preventDefault();
             event.stopPropagation();
-            
+
             // Add visual feedback
             element.style.transform = 'scale(0.95)';
             element.style.background = '#d0d0d0';
-            
+
             // Execute callback after a short delay for better visual feedback
             setTimeout(() => {
                 callback();
@@ -1061,40 +1061,40 @@ class DailyQuotePuzzle {
                 element.style.background = '';
             }, 50);
         };
-        
+
         // Touch event handling for mobile
         element.addEventListener('touchstart', (event) => {
             touchStartTime = Date.now();
             touchStartY = event.touches[0].clientY;
             touchStartX = event.touches[0].clientX;
             isTouchMoved = false;
-            
+
             // Prevent zoom on double tap
             event.preventDefault();
         }, { passive: false });
-        
+
         element.addEventListener('touchmove', (event) => {
             const touchY = event.touches[0].clientY;
             const touchX = event.touches[0].clientX;
             const deltaY = Math.abs(touchY - touchStartY);
             const deltaX = Math.abs(touchX - touchStartX);
-            
+
             // If touch moved significantly, mark as moved
             if (deltaY > 10 || deltaX > 10) {
                 isTouchMoved = true;
             }
         });
-        
+
         element.addEventListener('touchend', (event) => {
             const touchEndTime = Date.now();
             const touchDuration = touchEndTime - touchStartTime;
-            
+
             // Only trigger if touch was short and didn't move much
             if (touchDuration < 300 && !isTouchMoved) {
                 handleInteraction(event);
             }
         });
-        
+
         // Mouse click handling for desktop
         element.addEventListener('click', (event) => {
             // Only handle mouse clicks if not on a touch device
@@ -1102,7 +1102,7 @@ class DailyQuotePuzzle {
                 handleInteraction(event);
             }
         });
-        
+
         // Prevent context menu on long press
         element.addEventListener('contextmenu', (event) => {
             event.preventDefault();
@@ -1111,29 +1111,29 @@ class DailyQuotePuzzle {
 
     handleLetterClick(letter, index) {
         if (this.usedLetters.includes(index) || this.isUnscrambling) return;
-        
+
         this.userInput += letter;
         this.usedLetters = [...this.usedLetters, index];
-        
+
         this.playTypingSound();
         this.renderInputArea();
-        
+
         // Save current state after each letter click
         this.saveCurrentPuzzleState();
-        
+
         // For authors, check against length without spaces
         const targetLength = this.activeWord.isAuthor ?
             this.activeWord.original.replace(/\s/g, '').length :
             this.activeWord.original.length;
-            
+
         if (this.userInput.length === targetLength) {
             const inputWord = this.userInput.toLowerCase();
             const targetWord = this.activeWord.original.toLowerCase();
-            
+
             // For authors, remove spaces from both input and target for comparison
             const compareInput = this.activeWord.isAuthor ? inputWord : inputWord;
             const compareTarget = this.activeWord.isAuthor ? targetWord.replace(/\s/g, '') : targetWord;
-            
+
             if (compareInput === compareTarget) {
                 if (this.activeWord.isAuthor) {
                     this.authorSolved = true;
@@ -1144,10 +1144,10 @@ class DailyQuotePuzzle {
                     this.updateWordDisplay(this.activeWord);
                     this.playWordCompleteSound();
                 }
-                
+
                 // Save state after word/author completion
                 this.saveCurrentPuzzleState();
-                
+
                 setTimeout(() => {
                     this.activateNextWordSmoothly();
                 }, 1200);
@@ -1158,101 +1158,101 @@ class DailyQuotePuzzle {
             }
         }
     }
-    
+
     updateWordDisplay(wordData) {
         const wordElements = document.querySelectorAll('.quote-word');
         const targetWordEl = Array.from(wordElements).find(el =>
             el.dataset.wordIndex == wordData.index
         );
-        
+
         if (targetWordEl) {
             const words = this.currentQuote.text.split(' ');
             const properWord = this.getProperCapitalization(wordData.original, wordData.index, words);
-            
+
             this.animateWordCompletion(targetWordEl, properWord);
         }
     }
-    
+
     updateAuthorDisplay() {
         const authorName = this.toTitleCase(this.currentQuote.author);
         this.animateAuthorCompletion(this.elements.quoteAuthor, `- ${authorName}`);
     }
-    
+
     animateWordCompletion(wordElement, newText) {
         wordElement.classList.add('small-celebration');
-        
+
         setTimeout(() => {
             wordElement.textContent = newText;
             wordElement.className = 'quote-word word-reveal';
             wordElement.removeAttribute('data-word-index');
-            
+
             setTimeout(() => {
                 wordElement.classList.remove('word-reveal');
             }, 400);
         }, 400);
-        
+
         setTimeout(() => {
             wordElement.classList.remove('small-celebration');
         }, 800);
     }
-    
+
     animateAuthorCompletion(authorElement, newText) {
         authorElement.classList.add('small-celebration');
-        
+
         setTimeout(() => {
             authorElement.textContent = newText;
             authorElement.className = 'author word-reveal';
-            
+
             setTimeout(() => {
                 authorElement.classList.remove('word-reveal');
             }, 400);
         }, 400);
-        
+
         setTimeout(() => {
             authorElement.classList.remove('small-celebration');
         }, 800);
     }
-    
+
     async activateNextWordSmoothly() {
         document.querySelectorAll('.quote-word.active, .author.active').forEach(el => {
             el.classList.remove('active');
         });
-        
+
         this.activeWord = null;
         this.userInput = '';
         this.availableLetters = [];
         this.usedLetters = [];
         this.renderInputArea();
-        
+
         if (this.solvedWords.size === this.currentQuote.scrambledWords.length && this.authorSolved) {
             this.gameComplete = true;
-            
+
             // Record the puzzle completion FIRST, then update stats
             await this.recordPuzzleCompletion();
             await this.updateCongratsStats();
-            
+
             this.elements.congrats.classList.add('show');
             document.querySelector('.newspaper-container').classList.add('puzzle-complete');
-            
+
             // Set up congrats buttons after showing the section
             setTimeout(() => {
                 this.setupCongratsButtons();
             }, 100);
-            
+
             // Also set up event delegation as backup
             this.setupCongratsEventDelegation();
-            
+
             this.playQuoteCompleteSound();
-            
+
             const quoteContainer = document.querySelector('.quote-container');
             quoteContainer.classList.add('puzzle-completed', 'quote-complete');
             setTimeout(() => {
                 quoteContainer.classList.remove('puzzle-completed');
             }, 1000);
-            
+
             return;
         }
-        
+
         if (!this.authorSolved && this.solvedWords.size === this.currentQuote.scrambledWords.length) {
             setTimeout(() => {
                 this.activateAuthorSmoothly();
@@ -1268,134 +1268,134 @@ class DailyQuotePuzzle {
             }
         }
     }
-    
+
     activateWordSmoothly(wordData) {
         if (this.solvedWords.has(wordData.original)) return;
-        
+
         this.activeWord = wordData;
         this.userInput = '';
         this.availableLetters = wordData.scrambled.split('');
         this.usedLetters = [];
-        
+
         this.renderInputArea();
-        
+
         const wordElements = document.querySelectorAll('.quote-word.scrambled');
         const targetWordEl = Array.from(wordElements).find(el =>
             el.dataset.wordIndex == wordData.index
         );
-        
+
         document.querySelectorAll('.quote-word.active, .author.active').forEach(el => {
             el.classList.remove('active');
         });
-        
+
         if (targetWordEl) {
             targetWordEl.classList.add('active');
         }
-        
+
         // Check unscramble cooldown when new word is activated
         this.checkUnscrambleCooldown();
     }
-    
+
     activateAuthorSmoothly() {
         if (this.authorSolved) return;
-        
+
         this.activeWord = {
             original: this.currentQuote.author.toLowerCase(),
             scrambled: this.currentQuote.scrambledAuthor,
             isAuthor: true
         };
-        
+
         this.userInput = '';
-        
+
         // For authors, keep all letters together without spaces and track word structure
         this.availableLetters = this.currentQuote.scrambledAuthor.replace(/\s/g, '').split('');
         this.authorWordStructure = this.currentQuote.author.split(' ').map(word => word.length);
         this.usedLetters = [];
-        
+
         this.renderInputArea();
-        
+
         document.querySelectorAll('.quote-word.active, .author.active').forEach(el => {
             el.classList.remove('active');
         });
-        
+
         const authorEl = document.querySelector('.author.scrambled');
         if (authorEl) {
             authorEl.classList.add('active');
         }
-        
+
         // Check unscramble cooldown when author is activated
         this.checkUnscrambleCooldown();
     }
-    
+
     handleKeyDown(event) {
         if (!this.activeWord || this.availableLetters.length === 0 || this.isUnscrambling) return;
-        
+
         if (event.key === 'Backspace') {
             this.handleBackspace();
             return;
         }
-        
+
         if (event.key.length !== 1) return;
-        
+
         const key = event.key.toLowerCase();
         const availableIndex = this.availableLetters.findIndex((letter, index) =>
             letter.toLowerCase() === key && !this.usedLetters.includes(index)
         );
-        
+
         if (availableIndex !== -1) {
             this.handleLetterClick(this.availableLetters[availableIndex], availableIndex);
         }
     }
-    
+
     handleBackspace() {
         console.log('⌨️ Backspace triggered');
         if (!this.activeWord || this.userInput.length === 0 || this.isUnscrambling) {
             console.log('❌ Backspace blocked - no active word, no input, or unscrambling');
             return;
         }
-        
+
         console.log('✅ Backspace allowed, playing sound');
         this.playBackspaceSound();
         this.userInput = this.userInput.length > 0 ? this.userInput.slice(0, -1) : '';
         this.usedLetters = this.usedLetters.length > 0 ? this.usedLetters.slice(0, -1) : [];
         this.renderInputArea();
-        
+
         // Save current state after backspace
         this.saveCurrentPuzzleState();
     }
-    
+
     resetInput() {
         if (this.isUnscrambling) return;
-        
+
         this.playResetSound();
         this.userInput = '';
         this.usedLetters = [];
         this.renderInputArea();
-        
+
         // Save current state after reset
         this.saveCurrentPuzzleState();
     }
-    
+
     startUnscrambleCooldown() {
         this.unscrambleLastUsed = Date.now();
         this.elements.unscrambleBtn.disabled = true;
         this.elements.unscrambleBtn.style.opacity = '0.5';
-        
+
         // Show timer
         if (this.elements.unscrambleTimer) {
             this.elements.unscrambleTimer.classList.add('show');
         }
-        
+
         // Clear any existing interval
         if (this.unscrambleCooldownInterval) {
             clearInterval(this.unscrambleCooldownInterval);
         }
-        
+
         // Start the cooldown progress
         this.unscrambleCooldownInterval = setInterval(() => {
             const elapsed = Date.now() - this.unscrambleLastUsed;
             const progress = Math.min(elapsed / this.unscrambleCooldown, 1);
-            
+
             if (progress >= 1) {
                 // Cooldown complete
                 this.elements.unscrambleBtn.disabled = false;
@@ -1409,7 +1409,7 @@ class DailyQuotePuzzle {
             } else {
                 // Update visual progress and timer
                 this.elements.unscrambleBtn.style.opacity = 0.5 + (progress * 0.5);
-                
+
                 // Update timer display
                 if (this.elements.unscrambleTimer) {
                     const remainingTime = Math.ceil((this.unscrambleCooldown - elapsed) / 1000);
@@ -1418,11 +1418,11 @@ class DailyQuotePuzzle {
             }
         }, 100); // Update every 100ms for smooth progress
     }
-    
+
     checkUnscrambleCooldown() {
         const timeSinceLastUse = Date.now() - this.unscrambleLastUsed;
         const progress = Math.min(timeSinceLastUse / this.unscrambleCooldown, 1);
-        
+
         if (progress >= 1) {
             // Cooldown complete
             this.elements.unscrambleBtn.disabled = false;
@@ -1439,14 +1439,14 @@ class DailyQuotePuzzle {
             // Still in cooldown
             this.elements.unscrambleBtn.disabled = true;
             this.elements.unscrambleBtn.style.opacity = 0.5 + (progress * 0.5);
-            
+
             // Show and update timer
             if (this.elements.unscrambleTimer) {
                 this.elements.unscrambleTimer.classList.add('show');
                 const remainingTime = Math.ceil((this.unscrambleCooldown - timeSinceLastUse) / 1000);
                 this.elements.unscrambleTimer.textContent = `${remainingTime}s`;
             }
-            
+
             // Restart the interval if it's not running
             if (!this.unscrambleCooldownInterval) {
                 this.unscrambleCooldownInterval = setInterval(() => {
@@ -1455,42 +1455,42 @@ class DailyQuotePuzzle {
             }
         }
     }
-    
+
     async unscrambleCurrentWord() {
         if (!this.activeWord || this.isUnscrambling) return;
-        
+
         // Check cooldown
         const timeSinceLastUse = Date.now() - this.unscrambleLastUsed;
         if (timeSinceLastUse < this.unscrambleCooldown) {
             return; // Still in cooldown
         }
-        
+
         // Show rewarded ad before unscrambling
         try {
             console.log('🎬 Showing rewarded ad for unscramble...');
-            
+
             // Track unscramble attempt
             this.arkadium.trackEvent('unscramble_attempted', {
                 word: this.activeWord.original,
                 isAuthor: this.activeWord.isAuthor
             });
-            
+
             await this.arkadium.showRewardedAd();
             console.log('✅ Rewarded ad completed, proceeding with unscramble');
-            
+
             // Track successful unscramble
             this.arkadium.trackEvent('unscramble_completed', {
                 word: this.activeWord.original,
                 isAuthor: this.activeWord.isAuthor
             });
-            
+
         } catch (error) {
             console.log('❌ Rewarded ad failed or was cancelled:', error);
             // In development mode or if ad fails, still allow unscramble
             if (!this.arkadium.isDevelopmentMode()) {
                 console.log('🎮 Ad failed, but allowing unscramble in development mode');
             }
-            
+
             // Track unscramble without ad
             this.arkadium.trackEvent('unscramble_no_ad', {
                 word: this.activeWord.original,
@@ -1498,29 +1498,29 @@ class DailyQuotePuzzle {
                 error: error.message
             });
         }
-        
+
         this.isUnscrambling = true;
         this.elements.resetBtn.disabled = true;
         this.elements.backspaceBtn.disabled = true;
         this.elements.unscrambleBtn.disabled = true;
-        
+
         // Start the cooldown
         this.startUnscrambleCooldown();
-        
+
         const targetWord = this.activeWord.isAuthor ?
             this.activeWord.original.replace(/\s/g, '') :
             this.activeWord.original;
         const scrambledLetters = this.activeWord.isAuthor ?
             this.activeWord.scrambled.replace(/\s/g, '').split('') :
             this.activeWord.scrambled.split('');
-        
+
         this.userInput = '';
         this.usedLetters = [];
-        
+
         let letterIndex = 0;
         let attempts = 0;
         const maxAttempts = targetWord.length * 2; // Safety limit
-        
+
         const addNextLetter = () => {
             if (letterIndex >= targetWord.length) {
                 // Word is complete, check if it's correct
@@ -1528,7 +1528,7 @@ class DailyQuotePuzzle {
                 const targetWordLower = this.activeWord.isAuthor ?
                     this.activeWord.original.toLowerCase().replace(/\s/g, '') :
                     this.activeWord.original.toLowerCase();
-                
+
                 if (inputWord === targetWordLower) {
                     setTimeout(() => {
                         if (this.activeWord.isAuthor) {
@@ -1540,7 +1540,7 @@ class DailyQuotePuzzle {
                             this.updateWordDisplay(this.activeWord);
                             this.playWordCompleteSound();
                         }
-                        
+
                         setTimeout(() => {
                             this.isUnscrambling = false;
                             this.elements.resetBtn.disabled = false;
@@ -1555,7 +1555,7 @@ class DailyQuotePuzzle {
                     this.usedLetters = [];
                     letterIndex = 0;
                     attempts++;
-                    
+
                     if (attempts < maxAttempts) {
                         setTimeout(addNextLetter, 200);
                     } else {
@@ -1569,7 +1569,7 @@ class DailyQuotePuzzle {
                 }
                 return;
             }
-            
+
             attempts++;
             if (attempts > maxAttempts) {
                 // Safety timeout - give up
@@ -1580,32 +1580,32 @@ class DailyQuotePuzzle {
                 this.resetInput();
                 return;
             }
-            
+
             const targetLetter = targetWord[letterIndex];
-            const scrambledIndex = scrambledLetters.findIndex((letter, index) => 
+            const scrambledIndex = scrambledLetters.findIndex((letter, index) =>
                 letter.toLowerCase() === targetLetter.toLowerCase() && !this.usedLetters.includes(index)
             );
-            
+
             if (scrambledIndex !== -1) {
                 this.userInput += scrambledLetters[scrambledIndex];
                 this.usedLetters = [...this.usedLetters, scrambledIndex];
                 this.playTypingSound();
                 this.renderInputArea();
-                
+
                 letterIndex++;
                 setTimeout(addNextLetter, 200);
             } else {
                 // Letter not found, try to find any available letter
-                const availableIndex = scrambledLetters.findIndex((letter, index) => 
+                const availableIndex = scrambledLetters.findIndex((letter, index) =>
                     !this.usedLetters.includes(index)
                 );
-                
+
                 if (availableIndex !== -1) {
                     this.userInput += scrambledLetters[availableIndex];
                     this.usedLetters = [...this.usedLetters, availableIndex];
                     this.playTypingSound();
                     this.renderInputArea();
-                    
+
                     letterIndex++;
                     setTimeout(addNextLetter, 200);
                 } else {
@@ -1617,29 +1617,29 @@ class DailyQuotePuzzle {
                 }
             }
         };
-        
+
         addNextLetter();
     }
-    
+
     async renderCalendar() {
         const today = new Date();
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'];
-        
+
         this.elements.calendarMonthYear.textContent =
             `${monthNames[this.currentCalendarMonth]} ${this.currentCalendarYear}`;
-        
+
         const firstDay = new Date(this.currentCalendarYear, this.currentCalendarMonth, 1);
         const lastDay = new Date(this.currentCalendarYear, this.currentCalendarMonth + 1, 0);
         const daysInMonth = lastDay.getDate();
         const startingDayOfWeek = firstDay.getDay();
-        
+
         let html = '';
-        
+
         for (let i = 0; i < startingDayOfWeek; i++) {
             html += '<div class="calendar-date"></div>';
         }
-        
+
         const userData = await this.loadUserData();
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(this.currentCalendarYear, this.currentCalendarMonth, day);
@@ -1647,16 +1647,16 @@ class DailyQuotePuzzle {
             const isToday = dateStr === this.formatDate(today);
             const isPast = date < today;
             const isFuture = date > today;
-            
+
             let classes = 'calendar-date';
             if (isToday) classes += ' today';
             else if (isPast) classes += ' past';
             else if (isFuture) classes += ' future';
-            
+
             if (userData.puzzles && userData.puzzles[dateStr] && userData.puzzles[dateStr].solved) {
                 classes += ' solved';
             }
-            
+
             const quote = this.quotes.find(q => q.date === dateStr);
             if (quote) {
                 html += `<div class="${classes}" data-date="${dateStr}" style="cursor: pointer;" title="Play ${dateStr} puzzle">${day}</div>`;
@@ -1664,25 +1664,25 @@ class DailyQuotePuzzle {
                 html += `<div class="${classes}" style="opacity: 0.3;" title="No puzzle available">${day}</div>`;
             }
         }
-        
+
         this.elements.calendarDates.innerHTML = html;
-        
+
         document.querySelectorAll('.calendar-date[data-date]').forEach(el => {
             el.addEventListener('click', async () => {
                 const dateStr = el.dataset.date;
                 const clickedDate = new Date(dateStr);
                 const today = new Date();
                 const todayStr = this.formatDate(today);
-                
+
                 // Prevent clicking on future dates
                 if (clickedDate > today) {
                     return; // Do nothing for future dates
                 }
-                
+
                 // Hide congrats section when selecting any date from calendar
                 this.elements.congrats.classList.remove('show');
                 document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
-                
+
                 // If clicking on today's date, load today's puzzle properly
                 if (dateStr === todayStr) {
                     this.currentQuote = this.findTodayQuote();
@@ -1694,13 +1694,13 @@ class DailyQuotePuzzle {
                     this.usedLetters = [];
                     this.gameComplete = false;
                     this.startTime = new Date();
-                    
+
                     // Hide completed challenge buttons for today's puzzle
                     this.hideCompletedChallengeButtons();
-                    
+
                     // Check if today's puzzle is completed and show congrats if so
                     await this.checkQuoteCompletionStatus();
-                    
+
                     this.renderQuote();
                     this.updateDateDisplay();
                     this.renderInputArea();
@@ -1708,28 +1708,28 @@ class DailyQuotePuzzle {
                     // Load past challenge (without congrats/stats)
                     await this.loadChallengeForDate(dateStr);
                 }
-                
+
                 this.elements.calendarModal.style.display = 'none';
             });
         });
-        
+
         this.updateCalendarNavigation();
     }
-    
+
     updateCalendarNavigation() {
         const today = new Date();
         const quoteDates = this.quotes.map(q => new Date(q.date));
         const earliestDate = new Date(Math.min(...quoteDates));
         const latestDate = new Date(Math.max(...quoteDates));
-        
+
         const currentViewDate = new Date(this.currentCalendarYear, this.currentCalendarMonth, 1);
         const earliestViewDate = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), 1);
         this.elements.prevMonth.disabled = currentViewDate <= earliestViewDate;
-        
+
         const currentMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
         this.elements.nextMonth.disabled = currentViewDate >= currentMonthDate;
     }
-    
+
     showCompletedChallengeButtons(dateStr) {
         // Create or update the button bar for completed challenges
         let buttonBar = document.getElementById('completedChallengeButtons');
@@ -1737,12 +1737,12 @@ class DailyQuotePuzzle {
             buttonBar = document.createElement('div');
             buttonBar.id = 'completedChallengeButtons';
             buttonBar.className = 'completed-challenge-buttons';
-            
+
             // Insert after the quote container
             const quoteContainer = document.querySelector('.quote-container');
             quoteContainer.parentNode.insertBefore(buttonBar, quoteContainer.nextSibling);
         }
-        
+
         buttonBar.innerHTML = `
             <div class="button-group">
                 <button class="btn" id="pastChallengesFromCompleted">
@@ -1753,34 +1753,34 @@ class DailyQuotePuzzle {
                 </button>
             </div>
         `;
-        
+
         buttonBar.style.display = 'block';
-        
+
         // Add event listeners
         document.getElementById('pastChallengesFromCompleted').addEventListener('click', async () => {
             this.elements.calendarModal.style.display = 'flex';
             await this.renderCalendar();
             this.playButtonClickSound();
         });
-        
+
         document.getElementById('shareQuoteBtn').addEventListener('click', () => {
             this.shareQuote(dateStr);
             this.playButtonClickSound();
         });
     }
-    
+
     hideCompletedChallengeButtons() {
         const buttonBar = document.getElementById('completedChallengeButtons');
         if (buttonBar) {
             buttonBar.style.display = 'none';
         }
     }
-    
+
     shareQuote(dateStr) {
         //const quote = this.currentQuote;
         const shareUrl = `${window.location.origin}${window.location.pathname}?challenge=${dateStr}`;
         const shareText = `"${quote.text}" - ${quote.author}\n\nCan you unscramble this quote? Try it here:`;
-        
+
         // Try native sharing first (mobile devices)
         if (navigator.share) {
             navigator.share({
@@ -1796,10 +1796,10 @@ class DailyQuotePuzzle {
             this.fallbackShare(shareText, shareUrl);
         }
     }
-    
+
     fallbackShare(shareText, shareUrl) {
         const fullShareText = `${shareText}\n${shareUrl}`;
-        
+
         // Try to copy to clipboard
         if (navigator.clipboard) {
             navigator.clipboard.writeText(fullShareText).then(() => {
@@ -1811,7 +1811,7 @@ class DailyQuotePuzzle {
             this.showShareDialog(fullShareText);
         }
     }
-    
+
     showShareSuccess(message) {
         // Create a temporary success message
         const successDiv = document.createElement('div');
@@ -1830,14 +1830,14 @@ class DailyQuotePuzzle {
             font-size: 16px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         `;
-        
+
         document.body.appendChild(successDiv);
-        
+
         setTimeout(() => {
             successDiv.remove();
         }, 2000);
     }
-    
+
     showShareDialog(shareText) {
         // Create a modal with the share text for manual copying
         const modal = document.createElement('div');
@@ -1854,7 +1854,7 @@ class DailyQuotePuzzle {
             align-items: center;
             z-index: 10000;
         `;
-        
+
         modal.innerHTML = `
             <div class="share-modal-content" style="
                 background: white;
@@ -1891,9 +1891,9 @@ class DailyQuotePuzzle {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         // Close on background click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -1906,11 +1906,11 @@ class DailyQuotePuzzle {
         const quote = this.quotes.find(q => q.date === dateStr);
         if (quote) {
             this.currentQuote = quote;
-            
+
             // Check if this quote is already completed
             const userData = await this.loadUserData();
             const puzzleData = userData.puzzles[dateStr];
-            
+
             if (puzzleData && puzzleData.solved) {
                 // Quote is already completed, show just the quote without stats or congrats
                 this.gameComplete = true;
@@ -1919,28 +1919,28 @@ class DailyQuotePuzzle {
                 this.gameTime = puzzleData.time || 0;
                 this.startTime = new Date(dateStr);
                 this.endTime = new Date(dateStr); // Use original completion time
-                
+
                 this.renderQuote();
                 this.updateDateDisplay();
-                
+
                 // Hide input area and congrats for completed past challenges
                 this.elements.inputArea.classList.remove('show');
                 this.elements.congrats.classList.remove('show');
                 document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
-                
+
                 const quoteContainer = document.querySelector('.quote-container');
                 quoteContainer.classList.add('quote-complete');
-                
+
                 // Show action buttons for completed challenges
                 this.showCompletedChallengeButtons(dateStr);
-                
+
                 // Disable all interactive elements for completed challenges
                 this.disableInteractiveElements();
             } else {
                 // Check for saved state for this specific puzzle
                 const savedState = await this.loadCurrentPuzzleState();
                 const shouldRestoreState = savedState && savedState.date === dateStr;
-                
+
                 if (shouldRestoreState) {
                     // Restore saved state
                     console.log('🔄 Restoring saved state for puzzle:', dateStr);
@@ -1949,7 +1949,7 @@ class DailyQuotePuzzle {
                     this.gameComplete = savedState.gameComplete || false;
                     this.userInput = savedState.userInput || '';
                     this.usedLetters = savedState.usedLetters || [];
-                    
+
                     // Find the active word if it was saved
                     if (savedState.activeWord) {
                         this.activeWord = this.currentQuote.scrambledWords.find(
@@ -1960,19 +1960,19 @@ class DailyQuotePuzzle {
                     } else {
                         this.activeWord = null;
                     }
-                    
+
                     this.startTime = new Date();
-                    
+
                     this.elements.congrats.classList.remove('show');
                     document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
                     this.hideCompletedChallengeButtons();
                     this.renderQuote();
                     this.updateDateDisplay();
                     this.renderInputArea();
-                    
+
                     // Enable interactive elements
                     this.enableInteractiveElements();
-                    
+
                     // Auto-activate first unsolved word if no active word
                     if (!this.activeWord && this.currentQuote.scrambledWords.length > 0) {
                         const firstUnsolved = this.currentQuote.scrambledWords.find(
@@ -1994,17 +1994,17 @@ class DailyQuotePuzzle {
                     this.usedLetters = [];
                     this.gameComplete = false;
                     this.startTime = new Date();
-                    
+
                     this.elements.congrats.classList.remove('show');
                     document.querySelector('.newspaper-container').classList.remove('puzzle-complete');
                     this.hideCompletedChallengeButtons();
                     this.renderQuote();
                     this.updateDateDisplay();
                     this.renderInputArea();
-                    
+
                     // Enable interactive elements for new challenges
                     this.enableInteractiveElements();
-                    
+
                     if (this.currentQuote.scrambledWords.length > 0) {
                         setTimeout(() => {
                             this.handleWordClick(this.currentQuote.scrambledWords[0]);
@@ -2022,12 +2022,12 @@ class DailyQuotePuzzle {
             btn.style.pointerEvents = 'none';
             btn.style.opacity = '0.6';
         });
-        
+
         // Disable control buttons
         if (this.elements.resetBtn) this.elements.resetBtn.disabled = true;
         if (this.elements.backspaceBtn) this.elements.backspaceBtn.disabled = true;
         if (this.elements.unscrambleBtn) this.elements.unscrambleBtn.disabled = true;
-        
+
         // Disable word clicking
         const wordElements = document.querySelectorAll('.quote-word.scrambled, .author.scrambled');
         wordElements.forEach(el => {
@@ -2043,12 +2043,12 @@ class DailyQuotePuzzle {
             btn.style.pointerEvents = 'auto';
             btn.style.opacity = '1';
         });
-        
+
         // Enable control buttons
         if (this.elements.resetBtn) this.elements.resetBtn.disabled = false;
         if (this.elements.backspaceBtn) this.elements.backspaceBtn.disabled = false;
         if (this.elements.unscrambleBtn) this.elements.unscrambleBtn.disabled = false;
-        
+
         // Enable word clicking
         const wordElements = document.querySelectorAll('.quote-word.scrambled, .author.scrambled');
         wordElements.forEach(el => {
@@ -2056,7 +2056,7 @@ class DailyQuotePuzzle {
             el.style.cursor = 'pointer';
         });
     }
-    
+
     // Hamburger Menu Methods
     openMenu() {
         if (this.elements.slideMenu && this.elements.menuOverlay && this.elements.hamburgerMenu) {
@@ -2066,7 +2066,7 @@ class DailyQuotePuzzle {
             document.body.style.overflow = 'hidden'; // Prevent background scrolling
         }
     }
-    
+
     closeMenu() {
         if (this.elements.slideMenu && this.elements.menuOverlay && this.elements.hamburgerMenu) {
             this.elements.slideMenu.classList.remove('active');
@@ -2075,7 +2075,7 @@ class DailyQuotePuzzle {
             document.body.style.overflow = ''; // Restore scrolling
         }
     }
-    
+
     toggleMenu() {
         if (this.elements.slideMenu && this.elements.slideMenu.classList.contains('active')) {
             this.closeMenu();
@@ -2083,7 +2083,7 @@ class DailyQuotePuzzle {
             this.openMenu();
         }
     }
-    
+
     setupEventListeners() {
         // Debug: Check if elements exist
         console.log('Setting up event listeners...');
@@ -2099,7 +2099,7 @@ class DailyQuotePuzzle {
             statsIcon: !!this.elements.statsIcon,
             settingsIcon: !!this.elements.settingsIcon
         });
-        
+
         // Hamburger Menu Controls with mobile touch handling
         if (this.elements.hamburgerMenu) {
             this.addMobileTouchHandling(this.elements.hamburgerMenu, () => {
@@ -2107,20 +2107,20 @@ class DailyQuotePuzzle {
                 this.playButtonClickSound();
             });
         }
-        
+
         if (this.elements.closeMenu) {
             this.addMobileTouchHandling(this.elements.closeMenu, () => {
                 this.closeMenu();
                 this.playButtonClickSound();
             });
         }
-        
+
         if (this.elements.menuOverlay) {
             this.elements.menuOverlay.addEventListener('click', () => {
                 this.closeMenu();
             });
         }
-        
+
         // Menu Navigation Links with mobile touch handling
         if (this.elements.menuStatsLink) {
             this.addMobileTouchHandling(this.elements.menuStatsLink, async () => {
@@ -2130,7 +2130,7 @@ class DailyQuotePuzzle {
                 this.playButtonClickSound();
             });
         }
-        
+
         if (this.elements.menuCalendarLink) {
             this.addMobileTouchHandling(this.elements.menuCalendarLink, async () => {
                 this.closeMenu();
@@ -2139,7 +2139,7 @@ class DailyQuotePuzzle {
                 this.playButtonClickSound();
             });
         }
-        
+
         if (this.elements.menuHelpLink) {
             this.addMobileTouchHandling(this.elements.menuHelpLink, () => {
                 this.closeMenu();
@@ -2147,7 +2147,7 @@ class DailyQuotePuzzle {
                 this.playButtonClickSound();
             });
         }
-        
+
         if (this.elements.menuTestPersistenceLink) {
             this.addMobileTouchHandling(this.elements.menuTestPersistenceLink, async () => {
                 this.closeMenu();
@@ -2155,15 +2155,16 @@ class DailyQuotePuzzle {
                 this.playButtonClickSound();
             });
         }
-        
+
+        // Music selection disabled
         if (this.elements.menuChangeSongLink) {
-            this.addMobileTouchHandling(this.elements.menuChangeSongLink, () => {
-                this.closeMenu();
-                this.showMusicSelection();
-                this.playButtonClickSound();
-            });
+            // this.addMobileTouchHandling(this.elements.menuChangeSongLink, () => {
+            //     this.closeMenu();
+            //     this.showMusicSelection();
+            //     this.playButtonClickSound();
+            // });
         }
-        
+
         // Menu Settings Toggles
         if (this.elements.menuSoundEffectsToggle) {
             this.elements.menuSoundEffectsToggle.addEventListener('change', (e) => {
@@ -2176,7 +2177,7 @@ class DailyQuotePuzzle {
                 this.playButtonClickSound();
             });
         }
-        
+
         if (this.elements.menuBackgroundMusicToggle) {
             this.elements.menuBackgroundMusicToggle.addEventListener('change', (e) => {
                 this.backgroundMusicEnabled = e.target.checked;
@@ -2207,14 +2208,14 @@ class DailyQuotePuzzle {
             });
         }
         window.addEventListener('keydown', (e) => this.handleKeyDown(e));
-        
+
         // Close menu on Escape key
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.elements.slideMenu && this.elements.slideMenu.classList.contains('active')) {
                 this.closeMenu();
             }
         });
-        
+
         // Calendar functionality
         if (this.elements.calendarIcon) {
             this.elements.calendarIcon.addEventListener('click', async () => {
@@ -2222,13 +2223,13 @@ class DailyQuotePuzzle {
                 await this.renderCalendar();
             });
         }
-        
+
         if (this.elements.closeCalendar) {
             this.addMobileTouchHandling(this.elements.closeCalendar, () => {
                 this.elements.calendarModal.style.display = 'none';
             });
         }
-        
+
         if (this.elements.prevMonth) {
             this.addMobileTouchHandling(this.elements.prevMonth, async () => {
                 this.currentCalendarMonth--;
@@ -2239,7 +2240,7 @@ class DailyQuotePuzzle {
                 await this.renderCalendar();
             });
         }
-        
+
         if (this.elements.nextMonth) {
             this.addMobileTouchHandling(this.elements.nextMonth, async () => {
                 this.currentCalendarMonth++;
@@ -2250,20 +2251,20 @@ class DailyQuotePuzzle {
                 await this.renderCalendar();
             });
         }
-        
+
         // Help functionality with mobile touch handling
         if (this.elements.helpIcon) {
             this.addMobileTouchHandling(this.elements.helpIcon, () => {
                 this.elements.helpModal.style.display = 'flex';
             });
         }
-        
+
         if (this.elements.closeHelp) {
             this.addMobileTouchHandling(this.elements.closeHelp, () => {
                 this.elements.helpModal.style.display = 'none';
             });
         }
-        
+
         // Stats functionality with mobile touch handling
         if (this.elements.statsIcon) {
             this.addMobileTouchHandling(this.elements.statsIcon, async () => {
@@ -2271,36 +2272,36 @@ class DailyQuotePuzzle {
                 this.elements.statsModal.style.display = 'flex';
             });
         }
-        
+
         if (this.elements.closeStats) {
             this.addMobileTouchHandling(this.elements.closeStats, () => {
                 this.elements.statsModal.style.display = 'none';
             });
         }
-        
 
-        
+
+
         if (this.elements.closeSettings) {
             this.addMobileTouchHandling(this.elements.closeSettings, () => {
                 this.elements.settingsModal.style.display = 'none';
             });
         }
-        
-        // Music selection functionality with mobile touch handling
-        console.log('🎵 Change song button found:', !!this.elements.changeSongBtn);
-        if (this.elements.changeSongBtn) {
-            this.addMobileTouchHandling(this.elements.changeSongBtn, () => {
-                console.log('🎵 Change song clicked!');
-                this.showMusicSelection();
-            });
-        }
-        
-        if (this.elements.closeMusicSelection) {
-            this.addMobileTouchHandling(this.elements.closeMusicSelection, () => {
-                this.closeMusicSelection();
-            });
-        }
-        
+
+        // Music selection functionality disabled
+        // console.log('🎵 Change song button found:', !!this.elements.changeSongBtn);
+        // if (this.elements.changeSongBtn) {
+        //     this.addMobileTouchHandling(this.elements.changeSongBtn, () => {
+        //         console.log('🎵 Change song clicked!');
+        //         this.showMusicSelection();
+        //     });
+        // }
+
+        // if (this.elements.closeMusicSelection) {
+        //     this.addMobileTouchHandling(this.elements.closeMusicSelection, () => {
+        //         this.closeMusicSelection();
+        //     });
+        // }
+
         // Settings toggle listeners
         if (this.elements.soundEffectsToggle) {
             this.elements.soundEffectsToggle.addEventListener('change', (e) => {
@@ -2308,7 +2309,7 @@ class DailyQuotePuzzle {
                 this.saveSettings();
             });
         }
-        
+
         if (this.elements.backgroundMusicToggle) {
             this.elements.backgroundMusicToggle.addEventListener('change', (e) => {
                 this.backgroundMusicEnabled = e.target.checked;
@@ -2316,7 +2317,7 @@ class DailyQuotePuzzle {
                 this.saveSettings();
             });
         }
-        
+
         // Close modals when clicking outside
         document.addEventListener('click', (e) => {
             if (this.elements.calendarModal && e.target === this.elements.calendarModal) {
@@ -2343,21 +2344,21 @@ class DailyQuotePuzzle {
 
     setupCongratsButtons() {
         console.log('🔧 Setting up congrats buttons...');
-        
+
         // Use a more direct approach - wait for elements to be available
         setTimeout(() => {
             // Past challenges button
             const pastChallengesBtn = document.getElementById('pastChallengesBtn');
             console.log('🔍 Past challenges button found:', !!pastChallengesBtn);
             console.log('🔍 Button visible:', pastChallengesBtn ? window.getComputedStyle(pastChallengesBtn).display !== 'none' : false);
-            
+
             if (pastChallengesBtn) {
                 // Simple click event without mobile touch handling first
                 pastChallengesBtn.onclick = async (e) => {
                     console.log('📅 Past challenges button clicked!');
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     try {
                         this.elements.calendarModal.style.display = 'flex';
                         await this.renderCalendar();
@@ -2366,17 +2367,17 @@ class DailyQuotePuzzle {
                         console.error('Error opening calendar:', error);
                     }
                 };
-                
+
                 // Also add addEventListener as backup
                 pastChallengesBtn.addEventListener('click', async (e) => {
                     console.log('📅 Past challenges button clicked (addEventListener)!');
                 }, { once: false });
-                
+
                 // Add hover events to test if button is receiving events
                 pastChallengesBtn.addEventListener('mouseenter', () => {
                     console.log('🖱️ Mouse entered past challenges button');
                 });
-                
+
                 pastChallengesBtn.addEventListener('mouseleave', () => {
                     console.log('🖱️ Mouse left past challenges button');
                 });
@@ -2386,14 +2387,14 @@ class DailyQuotePuzzle {
             const shareFromCongratsBtn = document.getElementById('shareFromCongratsBtn');
             console.log('🔍 Share button found:', !!shareFromCongratsBtn);
             console.log('🔍 Button visible:', shareFromCongratsBtn ? window.getComputedStyle(shareFromCongratsBtn).display !== 'none' : false);
-            
+
             if (shareFromCongratsBtn) {
                 // Simple click event without mobile touch handling first
                 shareFromCongratsBtn.onclick = (e) => {
                     console.log('📤 Share button clicked!');
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     try {
                         const today = new Date();
                         const todayStr = this.formatDate(today);
@@ -2403,17 +2404,17 @@ class DailyQuotePuzzle {
                         console.error('Error sharing quote:', error);
                     }
                 };
-                
+
                 // Also add addEventListener as backup
                 shareFromCongratsBtn.addEventListener('click', (e) => {
                     console.log('📤 Share button clicked (addEventListener)!');
                 }, { once: false });
-                
+
                 // Add hover events to test if button is receiving events
                 shareFromCongratsBtn.addEventListener('mouseenter', () => {
                     console.log('🖱️ Mouse entered share button');
                 });
-                
+
                 shareFromCongratsBtn.addEventListener('mouseleave', () => {
                     console.log('🖱️ Mouse left share button');
                 });
@@ -2427,12 +2428,12 @@ class DailyQuotePuzzle {
         if (congratsContainer) {
             congratsContainer.addEventListener('click', async (e) => {
                 console.log('🎯 Click detected in congrats container:', e.target.id);
-                
+
                 if (e.target.id === 'pastChallengesBtn' || e.target.closest('#pastChallengesBtn')) {
                     console.log('📅 Past challenges clicked via delegation!');
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     try {
                         this.elements.calendarModal.style.display = 'flex';
                         await this.renderCalendar();
@@ -2441,12 +2442,12 @@ class DailyQuotePuzzle {
                         console.error('Error opening calendar via delegation:', error);
                     }
                 }
-                
+
                 if (e.target.id === 'shareFromCongratsBtn' || e.target.closest('#shareFromCongratsBtn')) {
                     console.log('📤 Share clicked via delegation!');
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     try {
                         const today = new Date();
                         const todayStr = this.formatDate(today);
@@ -2463,14 +2464,14 @@ class DailyQuotePuzzle {
     async checkForSharedChallenge() {
         const urlParams = new URLSearchParams(window.location.search);
         const challengeDate = urlParams.get('challenge');
-        
+
         if (challengeDate) {
             // Load the shared challenge
             const quote = this.quotes.find(q => q.date === challengeDate);
             if (quote) {
                 console.log(`Loading shared challenge for ${challengeDate}`);
                 await this.loadChallengeForDate(challengeDate);
-                
+
                 // Clear the URL parameter to avoid reloading on refresh
                 const newUrl = window.location.pathname;
                 window.history.replaceState({}, document.title, newUrl);
@@ -2540,7 +2541,7 @@ class DailyQuotePuzzle {
                     month: 'short',
                     day: 'numeric'
                 });
-                
+
                 challengesHtml += `
                     <div class="challenge-item" data-date="${date}">
                         <div class="challenge-date">${formattedDate}</div>
@@ -2584,10 +2585,10 @@ class DailyQuotePuzzle {
             modal.style.display = 'none';
         }
     }
-    
+
     async testPersistence() {
         console.log('🧪 Testing Arkadium persistence...');
-        
+
         // Test data
         const testData = {
             testKey: 'testValue',
@@ -2597,28 +2598,28 @@ class DailyQuotePuzzle {
                 testLevel: 5
             }
         };
-        
+
         try {
             // Test remote save
             console.log('💾 Testing remote save...');
             const saveResult = await this.arkadium.saveRemoteData('testData', testData);
             console.log('✅ Remote save result:', saveResult);
-            
+
             // Test remote load
             console.log('📂 Testing remote load...');
             const loadedData = await this.arkadium.loadRemoteData('testData');
             console.log('✅ Remote load result:', loadedData);
-            
+
             // Test local save
             console.log('💾 Testing local save...');
             const localSaveResult = await this.arkadium.saveLocalData('testLocalData', testData);
             console.log('✅ Local save result:', localSaveResult);
-            
+
             // Test local load
             console.log('📂 Testing local load...');
             const localLoadedData = await this.arkadium.loadLocalData('testLocalData');
             console.log('✅ Local load result:', localLoadedData);
-            
+
             // Show results in alert
             const message = `Persistence Test Results:
             
@@ -2628,158 +2629,64 @@ Local Save: ${localSaveResult ? '✅ Success' : '❌ Failed'}
 Local Load: ${localLoadedData ? '✅ Success' : '❌ Failed'}
 
 Check console for detailed logs.`;
-            
+
             alert(message);
-            
+
         } catch (error) {
             console.error('❌ Persistence test failed:', error);
             alert('Persistence test failed. Check console for details.');
         }
     }
-    
-    // Music selection methods
+
+    // Music selection methods - disabled
     showMusicSelection() {
-        this.renderMusicTracks();
-        this.elements.musicSelectionModal.style.display = 'flex';
+        // Music selection disabled
+        console.log('🎵 Music selection is disabled');
+        return;
+        // this.renderMusicTracks();
+        // this.elements.musicSelectionModal.style.display = 'flex';
     }
-    
+
     closeMusicSelection() {
-        this.elements.musicSelectionModal.style.display = 'none';
+        // Music selection disabled
+        return;
+        // this.elements.musicSelectionModal.style.display = 'none';
     }
-    
+
     renderMusicTracks() {
-        let html = '';
-        
-        Object.entries(this.musicTracks).forEach(([trackKey, track]) => {
-            const isSelected = track.id === this.currentMusicTrack;
-            const isUnlocked = track.unlocked;
-            const statusClass = isUnlocked ? 'unlocked' : 'locked';
-            const statusText = isUnlocked ? 'Unlocked' : 'Locked';
-            
-            html += `
-                <div class="music-track-card ${isSelected ? 'selected' : ''} ${!isUnlocked ? 'locked' : ''}" 
-                     data-track-key="${trackKey}" data-track-id="${track.id}">
-                    <div class="music-track-header">
-                        <div class="music-track-name">${track.name}</div>
-                        <div class="music-track-cost">${track.cost} 💎</div>
-                    </div>
-                    <div class="music-track-description">${track.description}</div>
-                    <div class="music-track-status ${statusClass}">
-                        ${isSelected ? 'Currently Playing' : statusText}
-                    </div>
-                </div>
-            `;
-        });
-        
-        this.elements.musicTracksGrid.innerHTML = html;
-        
-        // Add click listeners
-        this.elements.musicTracksGrid.querySelectorAll('.music-track-card').forEach(card => {
-            card.addEventListener('click', () => this.handleMusicTrackClick(card));
-        });
+        // Music selection disabled
+        console.log('🎵 Music tracks rendering is disabled');
+        return;
     }
-    
+
     async handleMusicTrackClick(card) {
-        const trackKey = card.dataset.trackKey;
-        const track = this.musicTracks[trackKey];
-        
-        if (!track.unlocked) {
-            // Try to unlock the track
-            await this.unlockMusicTrack(trackKey);
-            return;
-        }
-        
-        // Select the track
-        this.selectMusicTrack(trackKey);
+        // Music selection disabled
+        console.log('🎵 Music track selection is disabled');
+        return;
     }
-    
+
     async unlockMusicTrack(trackKey) {
-        const track = this.musicTracks[trackKey];
-        
-        if (!this.arkadium || !this.arkadium.isInitialized) {
-            alert('Arkadium SDK not available. Cannot unlock tracks in development mode.');
-            return;
-        }
-        
-        try {
-            // Check if user has enough gems
-            const wallet = await this.arkadium.getUserWallet();
-            if (wallet.gems < track.cost) {
-                alert(`Not enough gems! You need ${track.cost} gems to unlock "${track.name}".`);
-                return;
-            }
-            
-            // Confirm purchase
-            const confirmed = confirm(`Unlock "${track.name}" for ${track.cost} gems?`);
-            if (!confirmed) return;
-            
-            // Consume gems
-            const success = await this.arkadium.consumeGems(track.cost);
-            if (!success) {
-                alert('Failed to purchase track. Please try again.');
-                return;
-            }
-            
-            // Unlock the track
-            track.unlocked = true;
-            this.saveMusicTracks();
-            
-            // Refresh the display
-            this.renderMusicTracks();
-            
-            alert(`🎉 "${track.name}" unlocked successfully!`);
-            
-        } catch (error) {
-            console.error('Error unlocking music track:', error);
-            alert('Failed to unlock track. Please try again.');
-        }
+        // Music selection disabled
+        console.log('🎵 Music track unlocking is disabled');
+        return;
     }
-    
+
     selectMusicTrack(trackKey) {
-        const track = this.musicTracks[trackKey];
-        
-        // Stop current music
-        this.pauseBackgroundMusic();
-        
-        // Update current track
-        this.currentMusicTrack = track.id;
-        
-        // Save selection
-        this.saveMusicTracks();
-        
-        // Start new music if enabled
-        if (this.backgroundMusicEnabled) {
-            this.playBackgroundMusic();
-        }
-        
-        // Refresh display
-        this.renderMusicTracks();
-        
-        // Close modal
-        this.closeMusicSelection();
-        
-        console.log(`🎵 Switched to: ${track.name}`);
+        // Music selection disabled
+        console.log('🎵 Music track selection is disabled');
+        return;
     }
-    
+
     saveMusicTracks() {
-        const musicData = {
-            tracks: this.musicTracks,
-            currentTrack: this.currentMusicTrack
-        };
-        localStorage.setItem('quotePuzzleMusicData', JSON.stringify(musicData));
+        // Music selection disabled
+        console.log('🎵 Music tracks saving is disabled');
+        return;
     }
-    
+
     loadMusicTracks() {
-        const savedData = localStorage.getItem('quotePuzzleMusicData');
-        if (savedData) {
-            try {
-                const musicData = JSON.parse(savedData);
-                this.musicTracks = musicData.tracks || this.musicTracks;
-                this.currentMusicTrack = musicData.currentTrack || 'backgroundMusic';
-            } catch (error) {
-                console.error('Error loading music data:', error);
-            }
-        }
+        // Music selection disabled
+        console.log('🎵 Music tracks loading is disabled');
+        return;
     }
 
     // replayPastChallenge method removed - no longer needed since completed challenges are view-only
