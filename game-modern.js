@@ -1777,42 +1777,75 @@ class DailyQuotePuzzle {
     }
 
     shareQuote(dateStr) {
-        //const quote = this.currentQuote;
+        console.log('📤 shareQuote called with dateStr:', dateStr);
+        
+        const quote = this.currentQuote;
+        if (!quote) {
+            console.error('❌ No current quote available for sharing');
+            return;
+        }
+        
+        console.log('📝 Sharing puzzle for date:', dateStr);
+        
         const shareUrl = `${window.location.origin}${window.location.pathname}?challenge=${dateStr}`;
-        const shareText = `"${quote.text}" - ${quote.author}\n\nCan you unscramble this quote? Try it here:`;
+        
+        // Create a teaser message without revealing the quote or author
+        const teaserMessages = [
+            `🧩 Can you unscramble today's inspirational quote?\n\nTest your word puzzle skills with this daily quote challenge!`,
+            `🎯 Think you're good with words? Try this quote puzzle!\n\nUnscramble the wisdom - can you solve it?`,
+            `💭 A famous quote awaits your puzzle-solving skills!\n\nCan you unscramble the scrambled words?`,
+            `🔤 Word puzzle challenge: Unscramble the inspirational quote!\n\nPut your vocabulary to the test!`,
+            `✨ Hidden wisdom in scrambled words...\n\nCan you reveal the inspirational quote?`
+        ];
+        
+        // Use date to pick a consistent message for the same day
+        const messageIndex = new Date(dateStr).getDate() % teaserMessages.length;
+        const shareText = teaserMessages[messageIndex];
+
+        console.log('🔗 Share URL:', shareUrl);
+        console.log('📄 Share text:', shareText);
 
         // Try native sharing first (mobile devices)
         if (navigator.share) {
+            console.log('📱 Using native sharing');
             navigator.share({
                 title: 'Daily Quote Puzzle Challenge',
                 text: shareText,
                 url: shareUrl
             }).catch(err => {
-                console.log('Native sharing failed, falling back to clipboard');
+                console.log('❌ Native sharing failed, falling back to clipboard:', err);
                 this.fallbackShare(shareText, shareUrl);
             });
         } else {
+            console.log('💻 Using fallback sharing (no native share API)');
             // Fallback for desktop browsers
             this.fallbackShare(shareText, shareUrl);
         }
     }
 
     fallbackShare(shareText, shareUrl) {
+        console.log('📋 fallbackShare called');
         const fullShareText = `${shareText}\n${shareUrl}`;
 
         // Try to copy to clipboard
         if (navigator.clipboard) {
+            console.log('📋 Attempting to copy to clipboard');
             navigator.clipboard.writeText(fullShareText).then(() => {
+                console.log('✅ Successfully copied to clipboard');
                 this.showShareSuccess('Link copied to clipboard!');
-            }).catch(() => {
+            }).catch((error) => {
+                console.log('❌ Clipboard copy failed, showing dialog:', error);
                 this.showShareDialog(fullShareText);
             });
         } else {
+            console.log('❌ No clipboard API, showing dialog');
             this.showShareDialog(fullShareText);
         }
     }
 
     showShareSuccess(message) {
+        console.log('✅ Showing share success:', message);
+        
         // Create a temporary success message
         const successDiv = document.createElement('div');
         successDiv.className = 'share-success';
@@ -1822,19 +1855,27 @@ class DailyQuotePuzzle {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #222;
+            background: #28a745;
             color: white;
             padding: 15px 25px;
-            border-radius: 5px;
+            border-radius: 8px;
             z-index: 10000;
             font-size: 16px;
+            font-weight: bold;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease-in;
         `;
 
         document.body.appendChild(successDiv);
 
         setTimeout(() => {
-            successDiv.remove();
+            successDiv.style.opacity = '0';
+            successDiv.style.transition = 'opacity 0.3s ease-out';
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.remove();
+                }
+            }, 300);
         }, 2000);
     }
 
@@ -1864,7 +1905,7 @@ class DailyQuotePuzzle {
                 width: 90%;
                 text-align: center;
             ">
-                <h3 style="margin-bottom: 20px;">Share This Quote Challenge</h3>
+                <h3 style="margin-bottom: 20px;">Share This Puzzle Challenge</h3>
                 <textarea readonly style="
                     width: 100%;
                     height: 120px;
