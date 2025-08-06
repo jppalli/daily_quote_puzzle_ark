@@ -1777,7 +1777,7 @@ class DailyQuotePuzzle {
     }
     
     shareQuote(dateStr) {
-        const quote = this.currentQuote;
+        //const quote = this.currentQuote;
         const shareUrl = `${window.location.origin}${window.location.pathname}?challenge=${dateStr}`;
         const shareText = `"${quote.text}" - ${quote.author}\n\nCan you unscramble this quote? Try it here:`;
         
